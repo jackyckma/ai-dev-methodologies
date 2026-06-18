@@ -56,6 +56,20 @@ copy_tree_instructions
 copy_defaults
 
 copy_file "$BUNDLE_ROOT/templates/.agents/README.md" "$TARGET/.agents/README.md"
+if [[ -d "$BUNDLE_ROOT/templates/.agents/skills" ]]; then
+  mkdir -p "$TARGET/.agents/skills"
+  for skill_dir in "$BUNDLE_ROOT/templates/.agents/skills"/*/; do
+    [[ -d "$skill_dir" ]] || continue
+    skill_name="$(basename "$skill_dir")"
+    [[ "$skill_name" == "README.md" ]] && continue
+    mkdir -p "$TARGET/.agents/skills/$skill_name"
+    for f in "$skill_dir"*; do
+      [[ -f "$f" ]] || continue
+      copy_file "$f" "$TARGET/.agents/skills/$skill_name/$(basename "$f")"
+    done
+  done
+  copy_file "$BUNDLE_ROOT/templates/.agents/skills/README.md" "$TARGET/.agents/skills/README.md"
+fi
 copy_file "$BUNDLE_ROOT/templates/AGENTS.md" "$TARGET/AGENTS.md"
 copy_file "$BUNDLE_ROOT/templates/CLAUDE.md" "$TARGET/CLAUDE.md"
 copy_file "$BUNDLE_ROOT/templates/.cursor/rules/shared-instructions.mdc" "$TARGET/.cursor/rules/shared-instructions.mdc"

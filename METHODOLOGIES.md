@@ -47,6 +47,8 @@ Then customize `.agents/instructions/project-guidelines.md`.
 | C1 | Agent tooling guardrails (MCP-first) | [agent-tooling-guardrails.md](instructions/agent-tooling-guardrails.md) |
 | C2 | Local vs Cloud compatibility | [local-vs-cloud-agents.md](compatibility/local-vs-cloud-agents.md) |
 | C3 | Verification ladder (L0–L5) | Same |
+| C4 | Complexity review (optional skill) | [templates/.agents/skills/complexity-review/](templates/.agents/skills/complexity-review/) |
+| C5 | Deferred shortcuts ledger (optional skill) | [templates/.agents/skills/deferred-shortcuts/](templates/.agents/skills/deferred-shortcuts/) |
 
 ### Tier D — Optional founder defaults
 

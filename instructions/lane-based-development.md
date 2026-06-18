@@ -208,6 +208,7 @@ description: Lane X — <name>. Load before editing packages/lane-x-* or related
 1. UI stays thin — fetch from lane APIs only.
 2. Use simulator fixtures for stub-first development.
 3. Do not import other lanes' `src/` — contracts only.
+4. Deliberate simplifications → `defer:` comments per `karpathy-guidelines.md` §2.
 
 ## Verify
 - <command>
