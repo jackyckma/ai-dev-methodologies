@@ -21,6 +21,13 @@ Cross-agent instructions for this project. Bootstrapped from [ai-dev-methodologi
 | `issue-quality.md` | GitHub Issue template for agents |
 | `lane-based-development.md` | Optional — multi-module products |
 
+## Methodology pin
+
+| File | Purpose |
+|------|---------|
+| `METHODOLOGY.lock` | Bundle version synced into this project — read before manual updates |
+| `instructions/framework-adoption.md` | Import rules and manual sync process |
+
 ## Optional skills
 
 | Skill | Purpose |

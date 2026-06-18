@@ -1,0 +1,13 @@
+# Methodology bundle pin — do not edit version by hand except after a manual sync.
+# See .agents/instructions/framework-adoption.md
+
+source: https://github.com/jackyckma/ai-dev-methodologies
+version: "PLACEHOLDER"
+source_commit: PLACEHOLDER
+synced_at: PLACEHOLDER
+synced_by: bootstrap
+customized_files:
+  - .agents/instructions/project-guidelines.md
+  - docs/AGENT_ENV.md
+  - scripts/agent-verify.sh
+notes: Initial bootstrap. project-guidelines and AGENT_ENV require project-specific values.

@@ -31,6 +31,7 @@ Then customize `.agents/instructions/project-guidelines.md`.
 | A4 | Live documentation | [templates/docs/](templates/docs/) |
 | A5 | Session handoff | [session-handoff.md](instructions/session-handoff.md) |
 | A6 | Decision authority | [decision-authority.md](instructions/decision-authority.md) |
+| A7 | Framework adoption and manual updates | [framework-adoption.md](instructions/framework-adoption.md) |
 
 ### Tier B — Planning & coordination (multi-module projects)
 
@@ -99,6 +100,9 @@ Then customize `.agents/instructions/project-guidelines.md`.
 | `compatibility/` | Local Cursor vs Cloud Agent workflow |
 | `templates/` | Copied into target projects by bootstrap |
 | `scripts/` | Bootstrap and cloud env setup |
+| `VERSION` | Current bundle semver |
+| `CHANGELOG.md` | Release notes for manual project sync |
+| `CHANGELOG-GUIDE.md` | Maintainer release checklist and entry template |
 
 ---
 
@@ -106,6 +110,8 @@ Then customize `.agents/instructions/project-guidelines.md`.
 
 | Field | Value |
 |-------|-------|
-| Bundle version | 1.0 |
+| Bundle version | 1.1.0 |
 | Created | 2026-06-15 |
 | Source | Practices from OrbitaDev + Powerhouse, generalized |
+
+See [CHANGELOG.md](CHANGELOG.md). Bootstrapped projects pin version in `.agents/METHODOLOGY.lock`; update process in [framework-adoption.md](instructions/framework-adoption.md).

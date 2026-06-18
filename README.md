@@ -13,6 +13,12 @@ git clone https://github.com/jackyckma/ai-dev-methodologies.git /tmp/ai-dev-meth
 
 Or use this repo as a [GitHub template](https://github.com/jackyckma/ai-dev-methodologies/generate) when creating a new repository.
 
+Then customize `.agents/instructions/project-guidelines.md`.
+
+## Updating an existing project
+
+The bundle is **copied** into each repo, not linked. When you change the methodology, notify each project manually. Agents follow [framework-adoption.md](instructions/framework-adoption.md): read upstream `CHANGELOG.md`, replace **framework-owned** files only, update `.agents/METHODOLOGY.lock`. Do **not** re-run bootstrap with `--force` on active projects.
+
 ## What's inside
 
 | Path | Purpose |
@@ -23,6 +29,9 @@ Or use this repo as a [GitHub template](https://github.com/jackyckma/ai-dev-meth
 | [compatibility/](compatibility/) | Local Cursor vs Cloud Agents workflow |
 | [templates/](templates/) | Files copied into target projects by bootstrap |
 | [scripts/](scripts/) | `bootstrap-project.sh`, `setup-cloud-agent-env.sh` |
+| [CHANGELOG.md](CHANGELOG.md) | Release notes — read before syncing projects |
+| [CHANGELOG-GUIDE.md](CHANGELOG-GUIDE.md) | Maintainer checklist when releasing framework updates |
+| [VERSION](VERSION) | Current bundle semver |
 
 ## Agent entry points (after bootstrap)
 
@@ -44,4 +53,4 @@ See [defaults/README.md](defaults/README.md). These are **optional** — overrid
 
 ## Version
 
-Methodology bundle **1.0** (2026-06-15). Extracted from practices validated on OrbitaDev and Powerhouse, generalized for any AI-assisted repo.
+Methodology bundle **1.1.0** (2026-06-18). See [CHANGELOG.md](CHANGELOG.md). Extracted from practices validated on OrbitaDev and Powerhouse, generalized for any AI-assisted repo.

@@ -7,6 +7,7 @@ Read **`.agents/instructions/`** before non-trivial work:
 3. `.agents/instructions/project-guidelines.md`
 4. `.agents/instructions/agent-tooling-guardrails.md`
 5. `.agents/instructions/session-handoff.md` — when resuming or ending a session
+6. `.agents/instructions/framework-adoption.md` — when bootstrapping or syncing methodology
 
 When **resuming**, read `docs/SESSION_HANDOFF.md` first.
 

@@ -41,6 +41,37 @@ copy_tree_instructions() {
   copy_file "$BUNDLE_ROOT/METHODOLOGIES.md" "$TARGET/.agents/instructions/METHODOLOGIES.md"
 }
 
+write_methodology_lock() {
+  local lock="$TARGET/.agents/METHODOLOGY.lock"
+  if [[ -f "$lock" && "$FORCE" -ne 1 ]]; then
+    echo "skip (exists): $lock"
+    return 0
+  fi
+  local version synced_at source_commit
+  version="$(cat "$BUNDLE_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]' || echo "unknown")"
+  synced_at="$(date +%Y-%m-%d)"
+  source_commit="unknown"
+  if git -C "$BUNDLE_ROOT" rev-parse HEAD &>/dev/null; then
+    source_commit="$(git -C "$BUNDLE_ROOT" rev-parse --short HEAD)"
+  fi
+  mkdir -p "$(dirname "$lock")"
+  cat > "$lock" <<EOF
+# Methodology bundle pin — update only after a manual sync (see framework-adoption.md).
+
+source: https://github.com/jackyckma/ai-dev-methodologies
+version: "$version"
+source_commit: $source_commit
+synced_at: $synced_at
+synced_by: bootstrap
+customized_files:
+  - .agents/instructions/project-guidelines.md
+  - docs/AGENT_ENV.md
+  - scripts/agent-verify.sh
+notes: Initial bootstrap. Customize project-owned files before serious agent work.
+EOF
+  echo "write: $lock"
+}
+
 copy_defaults() {
   mkdir -p "$TARGET/.agents/defaults"
   for f in "$BUNDLE_ROOT/defaults/"*.md; do
@@ -54,6 +85,7 @@ echo "    Bundle: $BUNDLE_ROOT"
 
 copy_tree_instructions
 copy_defaults
+write_methodology_lock
 
 copy_file "$BUNDLE_ROOT/templates/.agents/README.md" "$TARGET/.agents/README.md"
 if [[ -d "$BUNDLE_ROOT/templates/.agents/skills" ]]; then
