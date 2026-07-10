@@ -69,8 +69,8 @@ framework is supposed to conserve.
 
 `instructions/judgment-rubrics.md` — externalized judgment as checklists,
 each judgment with one positive and one negative example: definition of
-done (verify before claiming), retry/换路/escalate decision table,
-wrong-direction signals, stop-and-ask triggers, quality floor.
+done (verify before claiming), a retry / change-approach / escalate decision
+table, wrong-direction signals, stop-and-ask triggers, quality floor.
 `model-orchestration.md` adds the structural rule: acceptance checks run in
 a fresh context, never by the author of the change.
 
@@ -108,7 +108,7 @@ a fresh context, never by the author of the change.
 
 Every future edit made by a smaller model will widen these cracks, because
 nothing tells it the full set of places that must move together. This is the
-mechanism by which the update process "漂移走樣".
+mechanism by which the update process drifts out of shape (漂移走樣).
 
 **Fix (implemented on this branch)**
 
