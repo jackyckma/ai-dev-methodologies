@@ -33,6 +33,7 @@ Then customize `.agents/instructions/project-guidelines.md`.
 | A6 | Decision authority | [decision-authority.md](instructions/decision-authority.md) |
 | A7 | Framework adoption and manual updates | [framework-adoption.md](instructions/framework-adoption.md) |
 | A8 | Judgment rubrics (done / stuck / escalate / ask) | [judgment-rubrics.md](instructions/judgment-rubrics.md) |
+| A9 | Framework evolution (maintainer process) | [framework-evolution.md](instructions/framework-evolution.md) |
 
 ### Tier B — Planning & coordination (multi-module projects)
 
@@ -41,6 +42,7 @@ Then customize `.agents/instructions/project-guidelines.md`.
 | B1 | Lane-based development | [lane-based-development.md](instructions/lane-based-development.md) |
 | B2 | Issue quality (AC + allowed paths) | [issue-quality.md](instructions/issue-quality.md) |
 | B3 | API-first / thin UI | Lane doc §3 layer order |
+| B4 | Autonomous work loop (batch execution, stop conditions) | [autonomous-loop.md](instructions/autonomous-loop.md) |
 
 ### Tier C — Agent tooling & verification
 

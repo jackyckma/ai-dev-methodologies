@@ -9,6 +9,7 @@ See [METHODOLOGIES.md](../METHODOLOGIES.md) for the full catalog.
 | decision-authority.md | A6 |
 | framework-adoption.md | A7 |
 | judgment-rubrics.md | A8 |
+| framework-evolution.md | A9 |
 | lane-based-development.md | B1 |
 | issue-quality.md | B2 |
 | autonomous-loop.md | B4 |
