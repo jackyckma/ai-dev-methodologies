@@ -25,6 +25,8 @@ here. Keep them in parity — if you change one, change all three.
 | `instructions/autonomous-loop.md` | Founder approves an unattended multi-issue run |
 | `instructions/issue-quality.md` | Creating or triaging issues for agent work |
 | `instructions/framework-adoption.md` | Bootstrapping or syncing this methodology bundle |
+| `instructions/framework-evolution.md` | Changing the framework itself; tagging `upstream-candidate:` learnings |
+| `instructions/agent-native-practices.md` | A Tier E practice is adopted in project-guidelines, or the founder asks about them |
 | `instructions/lane-based-development.md` | Lane-based projects only |
 | `instructions/METHODOLOGIES.md` | Choosing which methodologies apply to this project |
 

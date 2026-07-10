@@ -63,6 +63,14 @@ Then customize `.agents/instructions/project-guidelines.md`.
 | D2 | Cloudflare DNS/email | [defaults/cloudflare.md](defaults/cloudflare.md) |
 | D3 | AI providers (Minimax default) | [defaults/ai-providers.md](defaults/ai-providers.md) |
 
+### Tier E — Agent-native practices (optional, per-project adoption)
+
+| # | Practice | File |
+|---|----------|------|
+| E1–E4 | Structured state file, AI-first formats, machine-verifiable docs, fixture-first | [agent-native-practices.md](instructions/agent-native-practices.md) |
+
+A Tier E practice is active **only** if listed in the project's `project-guidelines.md` § Adopted optional practices.
+
 ---
 
 ## Agent reading order (session start)
@@ -93,6 +101,7 @@ Then customize `.agents/instructions/project-guidelines.md`.
 | Small product (1 agent) | A + B2 + C + D (optional) |
 | Multi-module product | A + B1 + B2 + C + live docs |
 | Local + Cloud Agents | A + C2 + `agent-verify.sh` + Zeabur staging (D1) |
+| Multi-tool parallel agents | A + B + C + consider Tier E (E1 state file) |
 
 ---
 

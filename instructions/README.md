@@ -15,5 +15,6 @@ See [METHODOLOGIES.md](../METHODOLOGIES.md) for the full catalog.
 | autonomous-loop.md | B4 |
 | agent-tooling-guardrails.md | C1 |
 | model-orchestration.md | C6 |
+| agent-native-practices.md | E (optional) |
 
 Project-specific: copy [templates/project-guidelines.template.md](../templates/project-guidelines.template.md) into target repos as `project-guidelines.md`.
