@@ -75,7 +75,7 @@ escalates.
 | Cheap-tier result fails acceptance once | Redo on mid tier (don't retry cheap) |
 | Mid tier fails the **same subtask** twice | Escalate to high tier **with the full failure trail**: each attempt, its error, your hypothesis why |
 | High tier cracked it | Extract the reusable pattern; batch-apply remaining similar cases on cheap tier |
-| Any tier, two full retry rounds spent | Stop; either escalate or ask the user — do not spend a third round |
+| Any tier, two full retry rounds spent | Stop; escalate or ask the user — never a third round. Inside an autonomous loop: mark the issue blocked and move on (`autonomous-loop.md`) |
 
 Never retry with an identical prompt. Every retry changes at least one of:
 model, approach, or the context provided.
@@ -86,13 +86,15 @@ The context that produced a change does not get to declare it done.
 
 - **Files / docs:** a fresh context reads the file back from disk and checks
   it against the acceptance criteria.
-- **Code:** run the tests or execute the code (see the verification ladder
-  in `compatibility/local-vs-cloud-agents.md`). Passing output is the claim;
-  the test run is the proof.
+- **Code:** run the tests or execute the code. Verification levels
+  (L0–L5) are defined in `local-vs-cloud-agents.md` (framework repo:
+  `compatibility/`; bootstrapped projects: `.agents/compatibility/`);
+  the project's actual commands live in `docs/AGENT_ENV.md`. Passing
+  output is the claim; the test run is the proof.
 - **High-risk judgment calls** (architecture, security-adjacent, anything on
-  the `decision-authority.md` Important list): get a second opinion in a
-  fresh context, or generate 2–3 candidate answers and have a separate
-  context pick with reasons.
+  the `decision-authority.md` Tier 3 block-and-ask list): get a second
+  opinion in a fresh context, or generate 2–3 candidate answers and have a
+  separate context pick with reasons.
 
 Cheapest acceptable verifier wins: a test run beats a model review; a model
 review beats nothing.

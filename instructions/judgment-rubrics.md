@@ -56,9 +56,9 @@ Escalate (per the `model-orchestration.md` §5 ladder) when **any** holds:
       of them.
 - [ ] You cannot explain **why** your candidate fix works — it just makes
       the symptom disappear.
-- [ ] The decision is on the `decision-authority.md` Important list and no
-      human is in the loop right now (escalate for a second opinion before
-      queueing the question).
+- [ ] The decision is on the `decision-authority.md` **Tier 3
+      (block-and-ask) list** and no human is available right now —
+      escalate for a second opinion while the question waits in the queue.
 
 **Positive example:** "Race condition: two failed fixes at mid tier. Wrote
 failure trail (attempt, error, hypothesis) and escalated to high tier."
@@ -71,13 +71,17 @@ cheap-tier work; look it up first.
 
 **Ask** when any of these is true; otherwise do not interrupt:
 
-- [ ] The choice is on the `decision-authority.md` Important list
-      (architecture, public API break, irreversible migration, prod deploy,
-      security/compliance).
+- [ ] The choice is on the `decision-authority.md` **Tier 3
+      (block-and-ask) list**: production deploy or merge to main,
+      irreversible migration or data deletion, public API/schema breaks
+      others consume, real money or missing credentials,
+      security/compliance/privacy implications.
 - [ ] Acceptance criteria are ambiguous **and** the interpretations diverge
       in a way that is expensive to reverse.
 - [ ] Real scope is ≥2× what the issue describes.
-- [ ] You need credentials, paid resources, or anything destructive.
+
+Architecture choices with a viable reversible default are **Tier 2**:
+queue a decision brief and keep working — do not block on them.
 
 Do **not** ask about: naming within conventions, internal structure,
 reversible defaults, which of two equivalent small tasks to do first —
