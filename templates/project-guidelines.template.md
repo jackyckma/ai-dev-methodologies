@@ -4,7 +4,7 @@ Customize this file for **this repository**. Shared methodologies live in `.agen
 
 ## Communication language
 
-- Respond to the user in **Traditional Chinese (繁體中文)** unless they ask for another language.
+- Respond to the user in **<!-- set per project, e.g. Traditional Chinese (繁體中文) or English -->** unless they ask for another language.
 - Keep code, commands, file paths, and quoted source in original language.
 
 ## Stack
@@ -53,6 +53,11 @@ Load Zeabur agent skills when doing deploy/log/env operations. Ask for IDs — d
 | Anthropic | `ANTHROPIC_API_KEY` | fallback |
 | OpenRouter | `OPENROUTER_API_KEY` | experiments |
 
+## Adopted optional practices
+
+<!-- Tier E practices enabled for this project — see
+     .agents/instructions/agent-native-practices.md. Empty = none adopted. -->
+
 ## Documentation to read before non-trivial work
 
 1. `docs/README.md`
@@ -72,7 +77,7 @@ When implementing a written spec, maintain `implementation-notes.md` (or section
 - Tradeoffs
 - Open questions
 
-Write notes in Traditional Chinese unless the team uses English.
+Write notes in the project's communication language (set above).
 
 ## Verification before handoff
 

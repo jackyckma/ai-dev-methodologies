@@ -20,6 +20,17 @@ Fill this in per project. Agents read it before choosing verify commands or esca
 | CI | L0+L1 on every PR | GitHub Actions secrets |
 | Zeabur staging | L4 HTTP smoke | Zeabur env vars |
 
+## Models available (verified YYYY-MM-DD)
+
+Per `.agents/instructions/model-orchestration.md` §1 — verify names in this
+environment before dispatching; never write model names from memory.
+
+| Tier | Model name | Use for |
+|------|------------|---------|
+| cheap | <!-- verify in environment --> | scans, batch edits, mechanical fixes |
+| mid | <!-- verify in environment --> | implementation, tests, docs |
+| high | <!-- verify in environment --> | architecture, debugging dead ends, high-risk review |
+
 ## Staging URL
 
 - **URL:** `https://<!-- your-staging -->.zeabur.app/` (or custom domain)

@@ -19,6 +19,8 @@ Then customize `.agents/instructions/project-guidelines.md`.
 
 The bundle is **copied** into each repo, not linked. When you change the methodology, notify each project manually. Agents follow [framework-adoption.md](instructions/framework-adoption.md): read upstream `CHANGELOG.md`, replace **framework-owned** files only, update `.agents/METHODOLOGY.lock`. Do **not** re-run bootstrap with `--force` on active projects.
 
+Changing the framework itself: see [framework-evolution.md](instructions/framework-evolution.md) (maintainer process and release coherence checklist).
+
 ## What's inside
 
 | Path | Purpose |
@@ -41,6 +43,8 @@ Target projects get thin wrappers that point to `.agents/instructions/`:
 - `CLAUDE.md` — Claude Code / Claude cloud
 - `.cursor/rules/shared-instructions.mdc` — Cursor
 
+All three name the same core files; the file → trigger map lives in `.agents/README.md`.
+
 ## Optional founder defaults
 
 Most projects by this founder use:
@@ -53,4 +57,4 @@ See [defaults/README.md](defaults/README.md). These are **optional** — overrid
 
 ## Version
 
-Methodology bundle **1.1.0** (2026-06-18). See [CHANGELOG.md](CHANGELOG.md). Extracted from practices validated on OrbitaDev and Powerhouse, generalized for any AI-assisted repo.
+Methodology bundle **1.2.0** (2026-07-10). See [CHANGELOG.md](CHANGELOG.md). Extracted from practices validated on OrbitaDev and Powerhouse, generalized for any AI-assisted repo.
