@@ -9,6 +9,7 @@ See [METHODOLOGIES.md](../METHODOLOGIES.md) for the full catalog.
 | decision-authority.md | A6 |
 | framework-adoption.md | A7 |
 | agent-tooling-guardrails.md | C1 |
+| model-orchestration.md | C6 |
 | issue-quality.md | B2 |
 | lane-based-development.md | B1 |
 
