@@ -4,6 +4,8 @@ How to release a methodology update so bootstrapped projects (and their agents) 
 
 Target audience: **you** when editing `ai-dev-methodologies`. Agents read the resulting [CHANGELOG.md](CHANGELOG.md) during manual sync.
 
+For the full maintainer change process (intake, proposals, upstream harvest, coherence checks), see [instructions/framework-evolution.md](instructions/framework-evolution.md).
+
 ---
 
 ## Quick checklist
@@ -16,6 +18,7 @@ Before telling projects to update:
 - [ ] Each changed **framework-owned** path named (see below)
 - [ ] `[breaking]` or **Migration** section if projects must do more than copy files
 - [ ] [METHODOLOGIES.md](METHODOLOGIES.md) version table updated (if bundle version line exists)
+- [ ] Release coherence checklist passed — [framework-evolution.md](instructions/framework-evolution.md) §5 (parity, indexing, bootstrap coverage)
 - [ ] Optional: git tag `vX.Y.Z` and push
 
 Then notify each project (5–8 is fine manually):
@@ -132,29 +135,11 @@ Delete the **Notify text** subsection from CHANGELOG before commit if you prefer
 
 ## Framework-owned paths (sync list)
 
-When you change any of these, **name them in Changed/Added/Removed**:
+The **canonical list lives in [framework-adoption.md](instructions/framework-adoption.md) §2** — do not maintain a second copy here. Path mapping: framework repo `instructions/x.md` ↔ project `.agents/instructions/x.md`; framework `templates/<p>` ↔ project `<p>`.
 
-```text
-VERSION
-CHANGELOG.md
-METHODOLOGIES.md
-instructions/*.md
-defaults/*.md
-templates/.agents/README.md
-templates/.agents/skills/**/SKILL.md
-templates/.agents/METHODOLOGY.lock   # template only; projects keep their own lock
-templates/AGENTS.md
-templates/CLAUDE.md
-templates/.cursor/rules/shared-instructions.mdc
-templates/project-guidelines.template.md   # does NOT overwrite project project-guidelines.md
-templates/docs/*.md                      # templates only; not project live docs
-templates/scripts/agent-verify.sh
-compatibility/*.md
-scripts/bootstrap-project.sh
-scripts/setup-cloud-agent-env.sh
-```
+When you change any framework-owned path, **name it in Changed/Added/Removed**.
 
-Do **not** expect projects to pull changes to `project-guidelines.md`, `docs/CURRENT_STATUS.md`, etc. — those are project-owned.
+Do **not** expect projects to pull changes to `project-guidelines.md`, `docs/CURRENT_STATUS.md`, etc. — those are project-owned (listed in the same section).
 
 ---
 
@@ -196,10 +181,12 @@ git push && git push --tags
 | Bump major for every change | Fatigue; projects defer sync |
 | Forget to list bootstrap/script changes | Silent drift in lock or copy behavior |
 | Only update VERSION, not CHANGELOG | Lock version and notes diverge |
+| Skip the coherence checklist | Entry points and indexes drift apart |
 
 ---
 
 ## See also
 
-- [framework-adoption.md](instructions/framework-adoption.md) — how **projects** apply an update
+- [framework-evolution.md](instructions/framework-evolution.md) — maintainer change process and release coherence checklist
+- [framework-adoption.md](instructions/framework-adoption.md) — how **projects** apply an update (and the canonical framework-owned list, §2)
 - [README.md](README.md) — bootstrap quick start
