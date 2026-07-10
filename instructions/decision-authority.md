@@ -92,7 +92,8 @@ Mark deferred spots in code with `defer:` comments
 ## Record decisions
 
 When the founder decides, log it in `docs/project-progress.md` § Decisions
-Log (date, options, chosen path) and remove it from the pending queue.
+Log (create the file and section if the project does not have them yet) and
+remove it from the pending queue.
 An undecided brief older than its **Decide by** trigger gets re-surfaced at
 the top of the next sync, not silently dropped.
 

@@ -64,7 +64,8 @@ harvest"):**
 
 1. For each active project repo, read `docs/errors-and-learnings.md`
    (grep `upstream-candidate:`), the `defer:` ledger if present, and the
-   Decisions Log since the last harvest.
+   Decisions Log since the last harvest — skipping any of these the
+   project does not maintain.
 2. Keep patterns that appear in ≥2 projects, or single occurrences with
    high cost.
 3. Write one §3 proposal line per candidate; present as a batch.

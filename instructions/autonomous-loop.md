@@ -48,9 +48,9 @@ PICK → IMPLEMENT → VERIFY → COMMIT → RECORD → (stop check) → PICK �
 
 ## 3. Loop log — external memory, written every iteration
 
-Append one row per iteration to the "Current status" area of
-`docs/SESSION_HANDOFF.md` (or the project's progress doc if guidelines say
-so):
+Append one row per iteration to the `## Loop log` section of
+`docs/SESSION_HANDOFF.md` (add the section if the project's handoff
+predates it):
 
 ```text
 | # | Issue | Outcome | Commit | Verified by |

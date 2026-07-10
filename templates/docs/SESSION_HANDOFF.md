@@ -34,6 +34,14 @@
 <!-- Decision briefs awaiting the founder — format in decision-authority.md.
      Present grouped at sync points; move to Decisions Log once decided. -->
 
+## Loop log
+
+<!-- One row per autonomous-loop iteration — see autonomous-loop.md §3.
+     Leave empty when no loop ran. -->
+
+| # | Issue | Outcome | Commit | Verified by |
+|---|-------|---------|--------|-------------|
+
 ## Top priority next
 
 1. <!-- single next action -->

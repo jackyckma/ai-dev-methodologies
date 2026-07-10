@@ -108,7 +108,7 @@ a fresh context, never by the author of the change.
 
 Every future edit made by a smaller model will widen these cracks, because
 nothing tells it the full set of places that must move together. This is the
-mechanism by which the update process drifts out of shape (漂移走樣).
+mechanism by which the update process drifts out of shape.
 
 **Fix (implemented on this branch)**
 
