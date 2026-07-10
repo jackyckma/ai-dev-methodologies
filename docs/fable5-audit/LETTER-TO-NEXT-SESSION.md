@@ -36,12 +36,12 @@ vary across my projects", check this first.
 Each session adds instruction files; entry points accumulate imports. Claude
 Code `@import` lines in CLAUDE.md are loaded **every session whether needed
 or not**; Cursor `alwaysApply` rules likewise. The framework now
-distinguishes always-loaded (thin entry points) from load-on-demand
-(everything else) — keep that boundary. Before adding any new always-loaded
-line, ask: does every session need this? If not, it belongs in the index
-with a trigger condition ("read when X"). If session-start required reading
-exceeds roughly 300 lines total, weaker models start skimming — which is
-worse than not shipping the file.
+distinguishes always-loaded (four core files) from load-on-demand (the
+trigger map in `.agents/README.md`) — keep that boundary. Before adding any
+new always-loaded line, ask: does every session need this? If not, it
+belongs in the trigger map with a condition ("read when X"). If
+session-start required reading exceeds roughly 300 lines total, weaker
+models start skimming — which is worse than not shipping the file.
 
 ---
 
@@ -59,24 +59,60 @@ worse than not shipping the file.
 
 ## 3. Environment notes for future maintenance sessions
 
-- This session ran in Claude Cowork with subagent support (Agent tool);
-  the wrap-up adversarial review used a fresh-context subagent. If your
-  environment lacks subagents, substitute: finish writing, then re-read
-  every changed file from disk in a fresh pass and check it against
+- This session ran in Claude Cowork with subagent support (Agent tool); the
+  wrap-up adversarial review used a fresh-context subagent (5 blocking + 7
+  minor findings, all addressed except the pre-existing items below). If
+  your environment lacks subagents, substitute: finish writing, then
+  re-read every changed file from disk in a fresh pass and check it against
   DIAGNOSIS.md before pushing.
 - Commits on this branch were made via the GitHub API (Cowork sandbox has
-  no push credentials). Author metadata may look unusual; content is what
-  matters.
-- Known pre-existing issue left for the founder: mixed English/Chinese in
-  `CHANGELOG-GUIDE.md`, `framework-adoption.md` §6, and the Cursor template.
-  New content is English-only by the founder's rule. Do not "helpfully"
-  translate old content without being asked.
+  no push credentials). Two side effects: author metadata looks unusual,
+  and **`scripts/bootstrap-project.sh` lost its executable bit** (now
+  100644). Founder: run `chmod +x scripts/bootstrap-project.sh && git
+  commit` after merging, or invoke it with `bash` in the meantime.
+- Known pre-existing issues left for the founder (do not "fix" without
+  asking):
+  1. Language mix in `CHANGELOG-GUIDE.md` (notify templates),
+     `framework-adoption.md` §6, and lane doc §9/§15 — new content is
+     English-only by the founder's rule; old Chinese strings were left
+     untouched.
+  2. `bootstrap-project.sh` copies `METHODOLOGIES.md` into
+     `.agents/instructions/`, where its repo-root-relative links
+     (`instructions/…`, `templates/…`, `compatibility/…`) break. Tagged
+     here as an `upstream-candidate:` for the next release to fix
+     deliberately (e.g. rewrite links on copy, or copy to repo root).
 
-## 4. Where session A-work ended (updated at wrap-up)
+## 4. Where session A-work ended (wrap-up status, 2026-07-10)
 
-> Status as of final wrap-up — see bottom of file. If this section still
-> says PLACEHOLDER, the session was cut off before wrap-up; check
-> `git log fable5/framework-upgrade-20260710` for the last completed item
-> and resume from the priority order at the end of DIAGNOSIS.md.
+**Everything planned was completed and released as v1.2.0 on this branch.**
+Nothing is half-finished. Shipped, in order:
 
-PLACEHOLDER — updated at end of session.
+1. `[B]` `docs/fable5-audit/DIAGNOSIS.md` — top-3 weaknesses (W1 human-as-scheduler, W2 undefined done/stuck, W3 self-drift)
+2. `[C]` this letter
+3. `[A]` `model-orchestration.md` (C6), `judgment-rubrics.md` (A8),
+   `decision-authority.md` three-tier rewrite + lane §10 dedup,
+   `autonomous-loop.md` (B4), entry-point parity across
+   AGENTS/CLAUDE/Cursor + trigger map in `.agents/README.md`,
+   `framework-evolution.md` (A9) + canonical sync list, `agent-native-practices.md`
+   (Tier E, optional), template/README consistency fixes, VERSION 1.2.0 +
+   full CHANGELOG section
+4. Adversarial review fixes: tier terminology unified (no more "Important
+   list"), karpathy §1 routes "ask" through decision tiers, guardrails
+   added to reading order, `local-vs-cloud-agents.md` now ships to
+   projects, loop-log section added to the handoff template, notify text
+   in English
+
+**The branch is NOT merged to main** — founder review pending, as
+instructed.
+
+**Next session, pick up here:**
+
+1. Founder reviews `main...fable5/framework-upgrade-20260710`, merges, then
+   `chmod +x scripts/bootstrap-project.sh` and optionally tags `v1.2.0`.
+2. Sync the downstream projects (orbita, ai-transformation-io, powerhouse,
+   ai-business, OrbitaDev) per `framework-adoption.md` §3 — the 1.2.0
+   notify text in CHANGELOG.md is ready to paste.
+3. During each sync, fill `VERIFY_L0`/`VERIFY_L1` and the AGENT_ENV model
+   table where missing (§1.2 above — highest-leverage follow-up).
+4. In a few weeks: first upstream harvest (`framework-evolution.md` §4),
+   which should also pick up the two pre-existing issues in §3.
