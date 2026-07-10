@@ -50,6 +50,7 @@ Then customize `.agents/instructions/project-guidelines.md`.
 | C3 | Verification ladder (L0–L5) | Same |
 | C4 | Complexity review (optional skill) | [templates/.agents/skills/complexity-review/](templates/.agents/skills/complexity-review/) |
 | C5 | Deferred shortcuts ledger (optional skill) | [templates/.agents/skills/deferred-shortcuts/](templates/.agents/skills/deferred-shortcuts/) |
+| C6 | Model orchestration (dispatch, escalation, verify-not-self) | [model-orchestration.md](instructions/model-orchestration.md) |
 
 ### Tier D — Optional founder defaults
 
@@ -103,6 +104,7 @@ Then customize `.agents/instructions/project-guidelines.md`.
 | `VERSION` | Current bundle semver |
 | `CHANGELOG.md` | Release notes for manual project sync |
 | `CHANGELOG-GUIDE.md` | Maintainer release checklist and entry template |
+| `docs/fable5-audit/` | 2026-07-10 framework diagnosis and letter to future maintenance sessions |
 
 ---
 
@@ -110,7 +112,7 @@ Then customize `.agents/instructions/project-guidelines.md`.
 
 | Field | Value |
 |-------|-------|
-| Bundle version | 1.1.0 |
+| Bundle version | 1.2.0 |
 | Created | 2026-06-15 |
 | Source | Practices from OrbitaDev + Powerhouse, generalized |
 

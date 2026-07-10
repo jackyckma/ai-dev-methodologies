@@ -6,6 +6,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/). Version follows
 
 **Maintainers:** see [CHANGELOG-GUIDE.md](CHANGELOG-GUIDE.md) for release checklist and entry template.
 
+## [1.2.0] - 2026-07-10
+
+Agent-first maturity release, authored on branch `fable5/framework-upgrade-20260710`.
+Background and rationale: `docs/fable5-audit/DIAGNOSIS.md`.
+
+### Added
+
+- `instructions/model-orchestration.md` — model/subagent dispatch contract, escalation ladder, verification-not-by-author (Tier C6)
+
+### Changed
+
+- `METHODOLOGIES.md`, `instructions/README.md` — index new instruction files
+
 ## [1.1.0] - 2026-06-18
 
 ### Added
