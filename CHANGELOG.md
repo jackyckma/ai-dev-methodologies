@@ -17,16 +17,24 @@ Background and rationale: `docs/fable5-audit/DIAGNOSIS.md`.
 - `instructions/judgment-rubrics.md` — externalized judgment: done / stuck / escalate / ask rubrics, each with a positive and a negative example (Tier A8)
 - `instructions/autonomous-loop.md` — unattended issue-queue protocol: preconditions, loop log, stop conditions, batch exit report (Tier B4)
 - `instructions/framework-evolution.md` — maintainer process: intake, proposal format, upstream harvest, release coherence checklist (Tier A9)
+- `instructions/agent-native-practices.md` — **optional** Tier E practices (structured state file, AI-first formats, machine-verifiable docs, fixture-first) with an explicit per-project adoption gate
 
 ### Changed
 
-- `METHODOLOGIES.md`, `instructions/README.md` — index new instruction files; judgment-rubrics added to session-start reading order
+- `METHODOLOGIES.md`, `instructions/README.md` — index new instruction files (Tiers A8, A9, B4, C6, E); judgment-rubrics added to session-start reading order
 - `instructions/decision-authority.md` — rewritten as three tiers (decide-and-log, queue-for-batch, block-and-ask) with decision-brief format and deferral tactics
 - `instructions/lane-based-development.md` — §10 now points to decision-authority.md instead of duplicating it
 - `instructions/session-handoff.md`, `templates/docs/SESSION_HANDOFF.md` — added "Pending decisions" section for batched decision briefs
 - `templates/AGENTS.md`, `templates/CLAUDE.md`, `templates/.cursor/rules/shared-instructions.mdc`, `templates/.agents/README.md` — entry-point parity: identical core reading list in all three tools; single file→trigger map lives in `.agents/README.md`; Cursor rule no longer hardcodes a response language (set it in `project-guidelines.md`)
 - `instructions/framework-adoption.md` — §2 marked as the **canonical** framework-owned sync list; new instruction files added to it
 - `CHANGELOG-GUIDE.md` — framework-owned path list replaced by a pointer to framework-adoption §2; release gate now includes the framework-evolution coherence checklist
+- `templates/project-guidelines.template.md` — communication language is now a per-project placeholder (no hardcoded default); added "Adopted optional practices" section (Tier E gate)
+- `compatibility/agent-capability-matrix.template.md` — added "Models available" table per model-orchestration §1
+- `README.md` — version bump, entry-point parity note, link to framework-evolution
+
+### Notify text
+
+> Methodology 更新到 **v1.2.0**。New core file `judgment-rubrics.md` (always-read) plus `model-orchestration.md`, `autonomous-loop.md`, `agent-native-practices.md` (optional), `framework-evolution.md`; entry points (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules/shared-instructions.mdc`) and `.agents/README.md` changed — replace all four, then sync the other framework-owned files per `framework-adoption.md` §3.
 
 ## [1.1.0] - 2026-06-18
 

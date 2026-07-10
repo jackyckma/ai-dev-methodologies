@@ -61,6 +61,7 @@ Copy from a fresh clone of `ai-dev-methodologies` at the target version (tag or 
 .agents/instructions/agent-tooling-guardrails.md
 .agents/instructions/model-orchestration.md
 .agents/instructions/autonomous-loop.md
+.agents/instructions/agent-native-practices.md
 .agents/instructions/issue-quality.md
 .agents/instructions/lane-based-development.md   # if project uses lanes
 .agents/instructions/framework-adoption.md
