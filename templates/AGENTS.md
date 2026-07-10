@@ -1,19 +1,22 @@
 # Agent Instructions (Codex / OpenAI coding agents)
 
-Read **`.agents/instructions/`** before non-trivial work:
+Before non-trivial work, read (in order):
 
-1. [METHODOLOGIES.md](https://github.com/jackyckma/ai-dev-methodologies/blob/main/METHODOLOGIES.md) — or local copy if vendored
-2. `.agents/instructions/karpathy-guidelines.md`
-3. `.agents/instructions/project-guidelines.md`
-4. `.agents/instructions/agent-tooling-guardrails.md`
-5. `.agents/instructions/session-handoff.md` — when resuming or ending a session
-6. `.agents/instructions/framework-adoption.md` — when bootstrapping or syncing methodology
+1. `.agents/instructions/karpathy-guidelines.md` — coding discipline
+2. `.agents/instructions/judgment-rubrics.md` — done / stuck / escalate / ask
+3. `.agents/instructions/project-guidelines.md` — stack, git, deploy, language
+4. `.agents/instructions/agent-tooling-guardrails.md` — MCP-first browser; no silent E2E deps
+
+Then consult **`.agents/README.md`** — it maps every other instruction file
+to its trigger (decisions, handoff, model dispatch, loops, issues,
+methodology sync).
 
 When **resuming**, read `docs/SESSION_HANDOFF.md` first.
 
-Optional: `.agents/instructions/lane-based-development.md` for multi-module products.
-
-Do not duplicate long policy here — keep this file a thin pointer.
+Do not duplicate long policy here — keep this file a thin pointer. The
+three entry points (`AGENTS.md`, `CLAUDE.md`,
+`.cursor/rules/shared-instructions.mdc`) must name the **same** core list;
+if you change one, change all three.
 
 ## Git workflow
 
