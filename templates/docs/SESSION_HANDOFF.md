@@ -29,6 +29,11 @@
 | Build | |
 | Tests | |
 
+## Pending decisions
+
+<!-- Decision briefs awaiting the founder — format in decision-authority.md.
+     Present grouped at sync points; move to Decisions Log once decided. -->
+
 ## Top priority next
 
 1. <!-- single next action -->
