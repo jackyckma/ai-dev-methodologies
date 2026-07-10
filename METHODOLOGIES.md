@@ -82,14 +82,15 @@ A Tier E practice is active **only** if listed in the project's `project-guideli
 3. `docs/SESSION_HANDOFF.md` (if resuming)
 4. `.agents/instructions/karpathy-guidelines.md`
 5. `.agents/instructions/judgment-rubrics.md`
-6. `.agents/instructions/project-guidelines.md`
-7. `docs/AGENT_ENV.md` (if present — especially when using Cloud Agents)
+6. `.agents/instructions/agent-tooling-guardrails.md`
+7. `.agents/instructions/project-guidelines.md`
+8. `docs/AGENT_ENV.md` (if present — especially when using Cloud Agents)
 
 ### Lane-based project (add)
 
-8. `docs/traceability-index.md`
-9. `docs/product-architecture.md`
-10. Target lane `INTERFACE.md` + lane `SKILL.md`
+9. `docs/traceability-index.md`
+10. `docs/product-architecture.md`
+11. Target lane `INTERFACE.md` + lane `SKILL.md`
 
 ---
 

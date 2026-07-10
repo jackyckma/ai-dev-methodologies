@@ -87,6 +87,8 @@ copy_tree_instructions
 copy_defaults
 write_methodology_lock
 
+copy_file "$BUNDLE_ROOT/compatibility/local-vs-cloud-agents.md" "$TARGET/.agents/compatibility/local-vs-cloud-agents.md"
+
 copy_file "$BUNDLE_ROOT/templates/.agents/README.md" "$TARGET/.agents/README.md"
 if [[ -d "$BUNDLE_ROOT/templates/.agents/skills" ]]; then
   mkdir -p "$TARGET/.agents/skills"
