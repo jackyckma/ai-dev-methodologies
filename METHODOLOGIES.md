@@ -32,6 +32,7 @@ Then customize `.agents/instructions/project-guidelines.md`.
 | A5 | Session handoff | [session-handoff.md](instructions/session-handoff.md) |
 | A6 | Decision authority | [decision-authority.md](instructions/decision-authority.md) |
 | A7 | Framework adoption and manual updates | [framework-adoption.md](instructions/framework-adoption.md) |
+| A8 | Judgment rubrics (done / stuck / escalate / ask) | [judgment-rubrics.md](instructions/judgment-rubrics.md) |
 
 ### Tier B — Planning & coordination (multi-module projects)
 
@@ -70,14 +71,15 @@ Then customize `.agents/instructions/project-guidelines.md`.
 2. `docs/CURRENT_STATUS.md`
 3. `docs/SESSION_HANDOFF.md` (if resuming)
 4. `.agents/instructions/karpathy-guidelines.md`
-5. `.agents/instructions/project-guidelines.md`
-6. `docs/AGENT_ENV.md` (if present — especially when using Cloud Agents)
+5. `.agents/instructions/judgment-rubrics.md`
+6. `.agents/instructions/project-guidelines.md`
+7. `docs/AGENT_ENV.md` (if present — especially when using Cloud Agents)
 
 ### Lane-based project (add)
 
-7. `docs/traceability-index.md`
-8. `docs/product-architecture.md`
-9. Target lane `INTERFACE.md` + lane `SKILL.md`
+8. `docs/traceability-index.md`
+9. `docs/product-architecture.md`
+10. Target lane `INTERFACE.md` + lane `SKILL.md`
 
 ---
 
@@ -85,7 +87,7 @@ Then customize `.agents/instructions/project-guidelines.md`.
 
 | Project profile | Adopt |
 |-----------------|-------|
-| Solo script / tiny app | A1–A3, A5, C1 |
+| Solo script / tiny app | A1–A3, A5, A8, C1 |
 | Small product (1 agent) | A + B2 + C + D (optional) |
 | Multi-module product | A + B1 + B2 + C + live docs |
 | Local + Cloud Agents | A + C2 + `agent-verify.sh` + Zeabur staging (D1) |

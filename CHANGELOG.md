@@ -14,10 +14,14 @@ Background and rationale: `docs/fable5-audit/DIAGNOSIS.md`.
 ### Added
 
 - `instructions/model-orchestration.md` — model/subagent dispatch contract, escalation ladder, verification-not-by-author (Tier C6)
+- `instructions/judgment-rubrics.md` — externalized judgment: done / stuck / escalate / ask rubrics, each with a positive and a negative example (Tier A8)
 
 ### Changed
 
-- `METHODOLOGIES.md`, `instructions/README.md` — index new instruction files
+- `METHODOLOGIES.md`, `instructions/README.md` — index new instruction files; judgment-rubrics added to session-start reading order
+- `instructions/decision-authority.md` — rewritten as three tiers (decide-and-log, queue-for-batch, block-and-ask) with decision-brief format and deferral tactics
+- `instructions/lane-based-development.md` — §10 now points to decision-authority.md instead of duplicating it
+- `instructions/session-handoff.md`, `templates/docs/SESSION_HANDOFF.md` — added "Pending decisions" section for batched decision briefs
 
 ## [1.1.0] - 2026-06-18
 
