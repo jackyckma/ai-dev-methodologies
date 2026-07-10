@@ -8,6 +8,7 @@ See [METHODOLOGIES.md](../METHODOLOGIES.md) for the full catalog.
 | session-handoff.md | A5 |
 | decision-authority.md | A6 |
 | framework-adoption.md | A7 |
+| judgment-rubrics.md | A8 |
 | agent-tooling-guardrails.md | C1 |
 | model-orchestration.md | C6 |
 | issue-quality.md | B2 |
