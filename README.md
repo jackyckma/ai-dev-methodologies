@@ -60,4 +60,4 @@ See [defaults/README.md](defaults/README.md). These are **optional** — overrid
 
 ## Version
 
-Methodology bundle **1.4.0**. See [CHANGELOG.md](CHANGELOG.md). Extracted from practices validated on OrbitaDev and Powerhouse (including Cursor Automations Autopilot), generalized for any AI-assisted repo.
+Methodology bundle **1.5.0**. See [CHANGELOG.md](CHANGELOG.md). Extracted from practices validated on OrbitaDev and Powerhouse (including Cursor Automations Autopilot), generalized for any AI-assisted repo.
