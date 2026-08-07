@@ -6,6 +6,33 @@ Format based on [Keep a Changelog](https://keepachangelog.com/). Version follows
 
 **Maintainers:** see [CHANGELOG-GUIDE.md](CHANGELOG-GUIDE.md) for release checklist and entry template.
 
+## [1.4.0] - 2026-08-07
+
+Portfolio hub reporting (optional Tier B6). Lets several projects report into one hub in a comparable shape, so a single agent session can brief across the portfolio without crawling every repo.
+
+### Added
+
+- `instructions/portfolio-hub-reporting.md` — six-section report contract, payload spec, two transports (file default / HTTP optional), opt-in gate, anti-patterns
+- `templates/docs/autopilot/report.schema.json` — JSON Schema for contract `schema_version` **1.0**; validates section set, order, and the "empty section keeps its key" rule
+- `templates/docs/autopilot/report.example.json` — worked fixture including an empty section and a correctly written `needs_founder` item
+
+### Changed
+
+- `METHODOLOGIES.md` — Tier **B6** row, adoption-matrix row, optional-practice gate now names B5 and B6; **version table corrected** (said 1.2.0 while VERSION/README said 1.3.0)
+- `instructions/README.md` — B6 index row
+- `instructions/framework-adoption.md` — §2 canonical list adds `portfolio-hub-reporting.md`, `report.schema.json`, `report.example.json` as framework-owned; `docs/autopilot/reports/**` explicitly project-owned; `project-hooks.json` hybrid rule now mentions the `orbita_hub` opt-in; new anti-pattern for locally editing the schema
+- `README.md`, `VERSION` → **1.4.0**
+
+### Design notes
+
+- **File transport is the default, HTTP is opt-in.** Most projects can commit `docs/autopilot/reports/latest.json` and get history from git — no new route, no new credential, no new attack surface. Early-stage projects with no running service can report from day one.
+- **The section set is closed.** Six projects with six bespoke shapes is worse than no reports, because the reader re-learns each one. A project chooses whether to report, never what shape.
+- **`status` describes report generation, not product health.** A project whose product is on fire still returns `status: ok` with the fire described under `risks` — otherwise the hub cannot distinguish "unhealthy" from "unreachable".
+
+### Notify text
+
+> Methodology updated to **v1.4.0**. New optional **Tier B6 portfolio hub reporting**: sync `.agents/instructions/portfolio-hub-reporting.md` + `docs/autopilot/report.schema.json` + `report.example.json`. Only implement a report generator if the project has opted in (`"orbita_hub": true` in `project-hooks.json` **and** listed in `project-guidelines.md` § Adopted optional practices). Prefer the file transport (`docs/autopilot/reports/latest.json`) unless the project already runs a service. **Do not** edit `report.schema.json` locally, and **do not** overwrite generated reports on sync.
+
 ## [1.3.0] - 2026-08-07
 
 Cursor Automations Autopilot harvested from Powerhouse / HiFi Job (optional Tier B5).
