@@ -6,6 +6,29 @@ Format based on [Keep a Changelog](https://keepachangelog.com/). Version follows
 
 **Maintainers:** see [CHANGELOG-GUIDE.md](CHANGELOG-GUIDE.md) for release checklist and entry template.
 
+## [1.3.0] - 2026-08-07
+
+Cursor Automations Autopilot harvested from Powerhouse / HiFi Job (optional Tier B5).
+
+### Added
+
+- `instructions/cursor-autopilot.md` — Maker/Checker loop, install checklist, hard rules, adoption gate (vs session `autonomous-loop.md`)
+- `templates/docs/autopilot/` — README, playbook, automations (paste prompts), JSON scaffolds, project-hooks, reports placeholder
+- `templates/scripts/autopilot/` — `dispatch-core.mjs`, `decide-next-action.mjs`, `queue-status.mjs`, `apply-decision-defaults.mjs`, generic `verify-all.mjs` (calls `agent-verify.sh` or `AUTOPILOT_VERIFY_CMD`), `deploy-watchdog.mjs` (optional `PROD_SMOKE_CMD`), `render-report.mjs`, `weekly-report.mjs`
+- Bootstrap copies Autopilot scaffolds into target projects (skip-if-exists)
+
+### Changed
+
+- `METHODOLOGIES.md`, `instructions/README.md`, `templates/.agents/README.md` — Tier **B5** index + trigger
+- `instructions/autonomous-loop.md` — clarifies session-loop vs Cursor Autopilot
+- `instructions/framework-adoption.md` — sync rules for autopilot scripts/playbook vs project-owned backlog JSON
+- `templates/project-guidelines.template.md` — optional `cursor-autopilot` adoption note
+- `README.md`, `VERSION` → **1.3.0**
+
+### Notify text
+
+> Methodology updated to **v1.3.0**. Optional **Cursor Autopilot** (Maker/Checker): sync `cursor-autopilot.md` + `docs/autopilot/{README,playbook,automations}.md` + `scripts/autopilot/*.mjs` if you want the loop; **do not** overwrite a live `backlog.json`/`roadmap.json`/`decisions.json`. New projects get scaffolds from bootstrap. Create two Cursor Automations from `automations.md` manually.
+
 ## [1.2.0] - 2026-07-10
 
 Agent-first maturity release, authored on branch `fable5/framework-upgrade-20260710`.

@@ -43,6 +43,7 @@ Then customize `.agents/instructions/project-guidelines.md`.
 | B2 | Issue quality (AC + allowed paths) | [issue-quality.md](instructions/issue-quality.md) |
 | B3 | API-first / thin UI | Lane doc §3 layer order |
 | B4 | Autonomous work loop (batch execution, stop conditions) | [autonomous-loop.md](instructions/autonomous-loop.md) |
+| B5 | Cursor Automations Autopilot (Maker/Checker, optional) | [cursor-autopilot.md](instructions/cursor-autopilot.md) · [templates/docs/autopilot/](templates/docs/autopilot/) |
 
 ### Tier C — Agent tooling & verification
 

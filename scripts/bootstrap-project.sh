@@ -118,9 +118,25 @@ copy_file "$BUNDLE_ROOT/templates/scripts/agent-verify.sh" "$TARGET/scripts/agen
 copy_file "$BUNDLE_ROOT/scripts/setup-cloud-agent-env.sh" "$TARGET/scripts/setup-cloud-agent-env.sh"
 chmod +x "$TARGET/scripts/agent-verify.sh" "$TARGET/scripts/setup-cloud-agent-env.sh" 2>/dev/null || true
 
+# Optional Cursor Autopilot scaffolds (Maker/Checker loop). Safe to skip-exists.
+if [[ -d "$BUNDLE_ROOT/templates/docs/autopilot" ]]; then
+  mkdir -p "$TARGET/docs/autopilot/reports" "$TARGET/scripts/autopilot"
+  for f in "$BUNDLE_ROOT/templates/docs/autopilot/"*; do
+    [[ -f "$f" ]] || continue
+    copy_file "$f" "$TARGET/docs/autopilot/$(basename "$f")"
+  done
+  copy_file "$BUNDLE_ROOT/templates/docs/autopilot/reports/README.md" "$TARGET/docs/autopilot/reports/README.md"
+  for f in "$BUNDLE_ROOT/templates/scripts/autopilot/"*.mjs; do
+    [[ -f "$f" ]] || continue
+    copy_file "$f" "$TARGET/scripts/autopilot/$(basename "$f")"
+  done
+fi
+
 echo ""
 echo "==> Done. Next steps:"
 echo "  1. Edit $TARGET/.agents/instructions/project-guidelines.md"
 echo "  2. Edit $TARGET/docs/AGENT_ENV.md (verification commands, staging URL)"
 echo "  3. Customize $TARGET/scripts/agent-verify.sh (VERIFY_L0 / VERIFY_L1)"
-echo "  4. Commit and push"
+echo "  4. Optional Autopilot: read docs/autopilot/README.md + .agents/instructions/cursor-autopilot.md;"
+echo "     create two Cursor Automations from docs/autopilot/automations.md"
+echo "  5. Commit and push"

@@ -1,9 +1,13 @@
 # Autonomous work loop
 
-Protocol for extended unattended runs — when the founder says "work the
-queue", "keep going until X", "/loop", or approves a batch of issues for
-autonomous execution. The goal: founder attention shifts from per-task
-approval to batch review of results.
+Protocol for extended unattended runs **inside one agent session** — when the
+founder says "work the queue", "keep going until X", "/loop", or approves a
+batch of issues for autonomous execution. The goal: founder attention shifts
+from per-task approval to batch review of results.
+
+For **cron Cursor Automations** (Maker/Checker, `docs/autopilot/`), see
+[`cursor-autopilot.md`](cursor-autopilot.md) instead — that is a different
+runner with a deterministic dispatcher.
 
 Depends on: `issue-quality.md` (agent-ready issues), `judgment-rubrics.md`
 (done/stuck/ask), `decision-authority.md` (tiers, decision queue),

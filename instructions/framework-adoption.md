@@ -61,6 +61,7 @@ Copy from a fresh clone of `ai-dev-methodologies` at the target version (tag or 
 .agents/instructions/agent-tooling-guardrails.md
 .agents/instructions/model-orchestration.md
 .agents/instructions/autonomous-loop.md
+.agents/instructions/cursor-autopilot.md          # optional practice; still sync the file
 .agents/instructions/agent-native-practices.md
 .agents/instructions/issue-quality.md
 .agents/instructions/lane-based-development.md   # if project uses lanes
@@ -73,9 +74,15 @@ AGENTS.md
 CLAUDE.md
 .cursor/rules/shared-instructions.mdc
 scripts/setup-cloud-agent-env.sh
+scripts/autopilot/*.mjs                           # Cursor Autopilot helpers (if project uses them)
+docs/autopilot/README.md
+docs/autopilot/playbook.md
+docs/autopilot/automations.md
 ```
 
 Replace the project's copy with the upstream file. If the project never adopted a new file (e.g. no `judgment-rubrics.md` yet), **add** it.
+
+**Cursor Autopilot JSON state** (`backlog.json`, `decisions.json`, `roadmap.json`, `locks.json`, `pause-state.json`, `reports/*`, filled `planner-preferences.md`) is **project-owned** — sync scripts/playbook/README/automations only; never overwrite a live backlog from upstream.
 
 ### Project-owned — never overwrite from upstream
 
@@ -101,6 +108,8 @@ Keep the project's version. If upstream adds a **new optional** section to a tem
 | `docs/AGENT_ENV.md` | Keep project-specific matrix; merge new rows from [agent-capability-matrix.template.md](../compatibility/agent-capability-matrix.template.md) if needed |
 | `.cursor/rules/shared-instructions.mdc` | Keep project-specific bullets (e.g. language); merge new shared rules from upstream |
 | `docs/README.md`, `docs/SESSION_HANDOFF.md` (structure) | Project-owned content; adopt new upstream template **sections** (not content) when CHANGELOG names them |
+| `docs/autopilot/project-hooks.json` | Keep project's `prod_smoke_cmd`; merge new keys from upstream template if CHANGELOG adds them |
+| `docs/autopilot/backlog.json` / `roadmap.json` / `decisions.json` | **Never** replace from upstream on an active loop — project task/decision data |
 
 If the project edited a **framework-owned** file locally, treat it as hybrid: note the path in `METHODOLOGY.lock` → `customized_files` and merge by hand on update.
 

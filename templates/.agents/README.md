@@ -22,7 +22,8 @@ here. Keep them in parity — if you change one, change all three.
 | `instructions/decision-authority.md` | Any decision beyond trivial; at session end to present queued decision briefs |
 | `instructions/session-handoff.md` | Pausing, resuming, or switching agents/environments |
 | `instructions/model-orchestration.md` | Before dispatching subagents or choosing models/effort |
-| `instructions/autonomous-loop.md` | Founder approves an unattended multi-issue run |
+| `instructions/autonomous-loop.md` | Founder approves an unattended multi-issue **session** run |
+| `instructions/cursor-autopilot.md` | Project adopts Cursor Automations Maker/Checker loop (`docs/autopilot/`) |
 | `instructions/issue-quality.md` | Creating or triaging issues for agent work |
 | `instructions/framework-adoption.md` | Bootstrapping or syncing this methodology bundle |
 | `instructions/framework-evolution.md` | Changing the framework itself; tagging `upstream-candidate:` learnings |

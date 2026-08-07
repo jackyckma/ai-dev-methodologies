@@ -13,6 +13,7 @@ See [METHODOLOGIES.md](../METHODOLOGIES.md) for the full catalog.
 | lane-based-development.md | B1 |
 | issue-quality.md | B2 |
 | autonomous-loop.md | B4 |
+| cursor-autopilot.md | B5 (optional) |
 | agent-tooling-guardrails.md | C1 |
 | model-orchestration.md | C6 |
 | agent-native-practices.md | E (optional) |

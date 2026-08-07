@@ -55,8 +55,9 @@ Load Zeabur agent skills when doing deploy/log/env operations. Ask for IDs — d
 
 ## Adopted optional practices
 
-<!-- Tier E practices enabled for this project — see
-     .agents/instructions/agent-native-practices.md. Empty = none adopted. -->
+<!-- Optional practices for this project. Empty = none adopted.
+     - Tier E: .agents/instructions/agent-native-practices.md
+     - Cursor Autopilot (B5): cursor-autopilot — docs/autopilot/ + Automations UI -->
 
 ## Documentation to read before non-trivial work
 
