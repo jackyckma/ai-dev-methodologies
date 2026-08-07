@@ -62,6 +62,7 @@ Copy from a fresh clone of `ai-dev-methodologies` at the target version (tag or 
 .agents/instructions/model-orchestration.md
 .agents/instructions/autonomous-loop.md
 .agents/instructions/cursor-autopilot.md          # optional practice; still sync the file
+.agents/instructions/portfolio-hub-reporting.md   # optional practice; still sync the file
 .agents/instructions/agent-native-practices.md
 .agents/instructions/issue-quality.md
 .agents/instructions/lane-based-development.md   # if project uses lanes
@@ -78,11 +79,19 @@ scripts/autopilot/*.mjs                           # Cursor Autopilot helpers (if
 docs/autopilot/README.md
 docs/autopilot/playbook.md
 docs/autopilot/automations.md
+docs/autopilot/report.schema.json                 # hub report contract (if project reports)
+docs/autopilot/report.example.json                # reference fixture
 ```
 
 Replace the project's copy with the upstream file. If the project never adopted a new file (e.g. no `judgment-rubrics.md` yet), **add** it.
 
 **Cursor Autopilot JSON state** (`backlog.json`, `decisions.json`, `roadmap.json`, `locks.json`, `pause-state.json`, `reports/*`, filled `planner-preferences.md`) is **project-owned** — sync scripts/playbook/README/automations only; never overwrite a live backlog from upstream.
+
+**Hub report contract vs generated reports.** `report.schema.json` is
+framework-owned: every reporting project must satisfy the *same* shape, so a
+project must never edit its local copy — if the shape is wrong, fix it
+upstream and re-release. Generated reports (`docs/autopilot/reports/latest.json`
+and any dated copies) are project-owned output; never sync those.
 
 ### Project-owned — never overwrite from upstream
 
@@ -94,6 +103,7 @@ docs/product-*.md
 docs/project-progress.md
 docs/traceability-index.md
 docs/errors-and-learnings.md
+docs/autopilot/reports/**                         # generated report output
 packages/**/INTERFACE.md
 .agents/skills/lane-*/SKILL.md
 ```
@@ -108,7 +118,7 @@ Keep the project's version. If upstream adds a **new optional** section to a tem
 | `docs/AGENT_ENV.md` | Keep project-specific matrix; merge new rows from [agent-capability-matrix.template.md](../compatibility/agent-capability-matrix.template.md) if needed |
 | `.cursor/rules/shared-instructions.mdc` | Keep project-specific bullets (e.g. language); merge new shared rules from upstream |
 | `docs/README.md`, `docs/SESSION_HANDOFF.md` (structure) | Project-owned content; adopt new upstream template **sections** (not content) when CHANGELOG names them |
-| `docs/autopilot/project-hooks.json` | Keep project's `prod_smoke_cmd`; merge new keys from upstream template if CHANGELOG adds them |
+| `docs/autopilot/project-hooks.json` | Keep project's `prod_smoke_cmd` and `orbita_hub` opt-in; merge new keys from upstream template if CHANGELOG adds them |
 | `docs/autopilot/backlog.json` / `roadmap.json` / `decisions.json` | **Never** replace from upstream on an active loop — project task/decision data |
 
 If the project edited a **framework-owned** file locally, treat it as hybrid: note the path in `METHODOLOGY.lock` → `customized_files` and merge by hand on update.
@@ -194,6 +204,7 @@ There is **no** scheduled auto-sync. With a small portfolio (~5–8 projects), t
 | Sync without reading CHANGELOG | Miss breaking migrations or skip new required files |
 | No update to `METHODOLOGY.lock` | Next agent cannot tell which version the project runs |
 | Replace project-owned docs from upstream templates | Wipes live project state |
+| Locally edit `report.schema.json` to fit one project | Breaks portfolio comparability — fix upstream instead |
 
 ---
 
