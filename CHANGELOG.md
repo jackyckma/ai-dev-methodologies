@@ -6,13 +6,42 @@ Format based on [Keep a Changelog](https://keepachangelog.com/). Version follows
 
 **Maintainers:** see [CHANGELOG-GUIDE.md](CHANGELOG-GUIDE.md) for release checklist and entry template.
 
+## [1.5.0] - 2026-08-07
+
+Two corrections to 1.4.0, plus making Autopilot Automations safe to leave switched on permanently.
+
+### Changed — report contract v1.0 → v1.1 (additive, nothing breaks)
+
+- `instructions/portfolio-hub-reporting.md` — **§1 now separates the repo edge from the runtime edge.** 1.4.0 collapsed two genuinely different reports into one and defaulted everything to the file transport. That was wrong: a production service does not know what is in `backlog.json`, and a git repo does not know last night's error rate or queue depth. Each edge now has its own transport (repo → committed file, runtime → HTTP), sharing one section set so briefs stay comparable. §4 gives per-edge fill guidance for all six sections.
+- `templates/docs/autopilot/report.schema.json` — optional `edge` field (`repo` \| `runtime`), defaulting to `repo`; `schema_version` accepts `1.0` and `1.1`. **Every 1.0 payload is still valid** — this is the worked example of the additive path.
+- `instructions/portfolio-hub-reporting.md` **§8 Evolving this contract** — the process that was missing in 1.4.0: change classes (clarification / additive / breaking), version rules, and the load-bearing migration rule that **the hub must accept both versions during a migration window**, because several projects will never migrate on the same day. Also states who decides (founder, at the framework repo) and that an agent finding the contract wrong must say so, not patch its local copy.
+- `project-hooks.json` gains `orbita_hub_edges` to declare which edges a project publishes.
+
+### Changed — Automations designed to stay on forever
+
+Motivation: needing to toggle an Automation in the Cursor UI is a liability, because the moment you need it off is usually the moment you are away from a computer.
+
+- `templates/scripts/autopilot/decide-next-action.mjs` — preflight returns `IDLE` with reason `no-autopilot-scaffolds` when `docs/autopilot/{backlog,roadmap}.json` are absent, instead of running on empty fallbacks. A repo whose Automations were wired before it had scaffolds now costs one command per tick and stops.
+- `templates/docs/autopilot/playbook.md` — new **§0 Stop conditions**: `IDLE` means stop immediately and leave no trace (no PR, branch, issue, commit, note, or long explanation); explicit stop table for missing scaffolds, dispatcher failure, pause, and unknown output; "unknown ≠ improvise". Documents that **pause/resume lives in `pause-state.json` on `main`, not in the UI**. REPLAN section now states that an empty roadmap yields IDLE rather than an invitation to propose direction.
+- `templates/docs/autopilot/automations.md` — pasted Maker/Checker prompts gain an explicit guard: stop if the dispatcher is missing, fails, prints nothing, or returns IDLE. New **Control surface** table mapping intents (pause everything / resume / idle one project / stop one task) to repo files, so the founder never needs the Cursor UI for routine control.
+
+### Migration
+
+- **Bundle files:** re-sync `portfolio-hub-reporting.md`, `report.schema.json`, `playbook.md`, `automations.md`, `scripts/autopilot/decide-next-action.mjs`.
+- **Cursor UI:** one-time re-paste of the two Agent Instructions from `automations.md` per project. This is the last UI trip the design requires — afterwards, control is in the repo.
+- **Report payloads:** none. `edge` is optional; existing generators keep working and are treated as `edge: repo`.
+
+### Notify text
+
+> Methodology updated to **v1.5.0**. Report contract → **v1.1**: repo edge and runtime edge are now separate (file transport vs HTTP) with an added optional `edge` field — **no payload migration needed**, 1.0 stays valid. Autopilot: re-sync `playbook.md`, `automations.md`, `decide-next-action.mjs`, then **re-paste the two Agent Instructions once** in the Cursor UI. After that, pause/resume via `docs/autopilot/pause-state.json` on `main` — do not toggle Automations in the UI. Unfueled repos now IDLE silently instead of improvising.
+
 ## [1.4.0] - 2026-08-07
 
 Portfolio hub reporting (optional Tier B6). Lets several projects report into one hub in a comparable shape, so a single agent session can brief across the portfolio without crawling every repo.
 
 ### Added
 
-- `instructions/portfolio-hub-reporting.md` — six-section report contract, payload spec, two transports (file default / HTTP optional), opt-in gate, anti-patterns
+- `instructions/portfolio-hub-reporting.md` — six-section report contract, payload spec, transports, opt-in gate, anti-patterns
 - `templates/docs/autopilot/report.schema.json` — JSON Schema for contract `schema_version` **1.0**; validates section set, order, and the "empty section keeps its key" rule
 - `templates/docs/autopilot/report.example.json` — worked fixture including an empty section and a correctly written `needs_founder` item
 
@@ -23,15 +52,9 @@ Portfolio hub reporting (optional Tier B6). Lets several projects report into on
 - `instructions/framework-adoption.md` — §2 canonical list adds `portfolio-hub-reporting.md`, `report.schema.json`, `report.example.json` as framework-owned; `docs/autopilot/reports/**` explicitly project-owned; `project-hooks.json` hybrid rule now mentions the `orbita_hub` opt-in; new anti-pattern for locally editing the schema
 - `README.md`, `VERSION` → **1.4.0**
 
-### Design notes
+### Known issue (fixed in 1.5.0)
 
-- **File transport is the default, HTTP is opt-in.** Most projects can commit `docs/autopilot/reports/latest.json` and get history from git — no new route, no new credential, no new attack surface. Early-stage projects with no running service can report from day one.
-- **The section set is closed.** Six projects with six bespoke shapes is worse than no reports, because the reader re-learns each one. A project chooses whether to report, never what shape.
-- **`status` describes report generation, not product health.** A project whose product is on fire still returns `status: ok` with the fire described under `risks` — otherwise the hub cannot distinguish "unhealthy" from "unreachable".
-
-### Notify text
-
-> Methodology updated to **v1.4.0**. New optional **Tier B6 portfolio hub reporting**: sync `.agents/instructions/portfolio-hub-reporting.md` + `docs/autopilot/report.schema.json` + `report.example.json`. Only implement a report generator if the project has opted in (`"orbita_hub": true` in `project-hooks.json` **and** listed in `project-guidelines.md` § Adopted optional practices). Prefer the file transport (`docs/autopilot/reports/latest.json`) unless the project already runs a service. **Do not** edit `report.schema.json` locally, and **do not** overwrite generated reports on sync.
+This release treated repo state and runtime state as one report and defaulted to the file transport. See 1.5.0 §1.
 
 ## [1.3.0] - 2026-08-07
 
