@@ -13,9 +13,45 @@ git fetch --all -q && git checkout main -q && git pull --rebase -q
 node scripts/autopilot/decide-next-action.mjs --lane <maker|checker>
 ```
 
-Execute only the returned JSON `action`. If `IDLE`, stop.
+Execute only the returned JSON `action`. If `IDLE`, stop — see §0.
 
 Prefer dependency-free verify commands documented in `docs/AGENT_ENV.md`.
+
+---
+
+## §0 Stop conditions — read before anything else
+
+Automations are meant to stay **switched on permanently**. That only works if
+"there is nothing to do" is a cheap, silent, zero-trace outcome. Doing nothing
+well is a first-class result, not a failure.
+
+**`IDLE` means: stop immediately and leave no trace.** Specifically, do **not**:
+
+- open a PR, branch, issue, or commit — including to `docs/`
+- "helpfully" invent work, scan the codebase for problems, or propose tasks
+- write a status comment, log file, or note anywhere
+- explain at length why you are idle — one line of output is enough
+
+An idle tick should cost roughly one command. If you find yourself reasoning
+about what *could* be done, you have already exceeded your mandate: the queue is
+the mandate.
+
+**Stop, changing nothing, in every one of these cases:**
+
+| Condition | What it means | Do |
+|---|---|---|
+| `action: IDLE` | No actionable work this tick | Stop |
+| `reason: no-autopilot-scaffolds` | Repo has no `docs/autopilot/` — never fueled | Stop. **Do not create scaffolds.** Fueling a repo is a founder decision |
+| Dispatcher missing / throws / prints nothing | Loop is not installed here, or is broken | Stop. Do not proceed from memory, and do not repair the loop as a side quest |
+| `pause-state.json` → `paused: true` | Kill-switch is on | Stop (Checker: only `WATCHDOG` recovery, and only when `by: deploy-watchdog`) |
+| Output is not one of the actions below | Unknown state | Stop. Unknown ≠ improvise |
+
+**Pausing and resuming is done in the repo, not in the Cursor UI.** Set
+`docs/autopilot/pause-state.json` → `"paused": true` on `main` and both lanes
+hold on the next tick; set it back to `false` to resume. This is deliberate: the
+switch lives where an agent or a phone can reach it, so nobody has to be at a
+desk to stop a loop. Toggling the Automation itself in the UI should be reserved
+for retiring a project for good.
 
 ---
 
@@ -58,9 +94,13 @@ Edit **only** `docs/autopilot/*`. No app code / flags / PR merges.
 4. Optionally append durable patterns to `planner-preferences.md`.
 5. Commit + push `docs/autopilot/*` to main (no PR).
 
+**If no epic is `approved`, REPLAN is not offered — you will get `IDLE`.** An
+empty roadmap means the founder has not chosen a direction yet; proposing one is
+not your job.
+
 ### `IDLE`
 
-Stop.
+Stop. See §0.
 
 ---
 
@@ -102,6 +142,10 @@ If no `prod_smoke_cmd` is configured, watchdog only records the main sha (see
 - weekly: `node scripts/autopilot/weekly-report.mjs > docs/autopilot/reports/weekly-$(date -u +%F).md`
 - Commit + push reports. No feature code.
 
+If the project has opted in to hub reporting (`orbita_hub: true` in
+`project-hooks.json`), also regenerate the machine-readable report per
+`.agents/instructions/portfolio-hub-reporting.md`.
+
 ### `IDLE`
 
-Stop.
+Stop. See §0.
