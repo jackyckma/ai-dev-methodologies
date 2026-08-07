@@ -33,6 +33,7 @@ Changing the framework itself: see [framework-evolution.md](instructions/framewo
 | [scripts/](scripts/) | `bootstrap-project.sh`, `setup-cloud-agent-env.sh` |
 | [templates/docs/autopilot/](templates/docs/autopilot/) | Optional Cursor Autopilot scaffolds (Maker/Checker) |
 | [templates/scripts/autopilot/](templates/scripts/autopilot/) | Autopilot dispatcher + helpers |
+| [portfolio-hub-reporting.md](instructions/portfolio-hub-reporting.md) | Optional six-section report contract for portfolio hubs ([schema](templates/docs/autopilot/report.schema.json)) |
 | [CHANGELOG.md](CHANGELOG.md) | Release notes — read before syncing projects |
 | [CHANGELOG-GUIDE.md](CHANGELOG-GUIDE.md) | Maintainer checklist when releasing framework updates |
 | [VERSION](VERSION) | Current bundle semver |
@@ -59,4 +60,4 @@ See [defaults/README.md](defaults/README.md). These are **optional** — overrid
 
 ## Version
 
-Methodology bundle **1.3.0**. See [CHANGELOG.md](CHANGELOG.md). Extracted from practices validated on OrbitaDev and Powerhouse (including Cursor Automations Autopilot), generalized for any AI-assisted repo.
+Methodology bundle **1.4.0**. See [CHANGELOG.md](CHANGELOG.md). Extracted from practices validated on OrbitaDev and Powerhouse (including Cursor Automations Autopilot), generalized for any AI-assisted repo.
