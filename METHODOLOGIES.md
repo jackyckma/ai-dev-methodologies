@@ -44,7 +44,7 @@ Then customize `.agents/instructions/project-guidelines.md`.
 | B3 | API-first / thin UI | Lane doc §3 layer order |
 | B4 | Autonomous work loop (batch execution, stop conditions) | [autonomous-loop.md](instructions/autonomous-loop.md) |
 | B5 | Cursor Automations Autopilot (Maker/Checker, optional) | [cursor-autopilot.md](instructions/cursor-autopilot.md) · [templates/docs/autopilot/](templates/docs/autopilot/) |
-| B6 | Portfolio hub reporting (six-section contract, optional) | [portfolio-hub-reporting.md](instructions/portfolio-hub-reporting.md) · [report.schema.json](templates/docs/autopilot/report.schema.json) |
+| B6 | Portfolio hub reporting (six-section contract, repo + runtime edges, optional) | [portfolio-hub-reporting.md](instructions/portfolio-hub-reporting.md) · [report.schema.json](templates/docs/autopilot/report.schema.json) |
 
 ### Tier C — Agent tooling & verification
 
@@ -129,7 +129,7 @@ A Tier E practice is active **only** if listed in the project's `project-guideli
 
 | Field | Value |
 |-------|-------|
-| Bundle version | 1.4.0 |
+| Bundle version | 1.5.0 |
 | Created | 2026-06-15 |
 | Source | Practices from OrbitaDev + Powerhouse, generalized |
 
