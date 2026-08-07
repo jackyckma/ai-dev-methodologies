@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/jackyckma/ai-dev-methodologies/blob/main/templates/docs/autopilot/report.schema.json",
+  "title": "Portfolio hub project report",
+  "description": "Shared report contract v1.0. Spec: .agents/instructions/portfolio-hub-reporting.md. Framework-owned — do not edit per project.",
+  "type": "object",
+  "required": ["schema_version", "project", "generated_at", "period", "status", "sections"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "project": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Stable lowercase slug matching the hub registry. Renaming breaks report history."
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "period": {
+      "type": "object",
+      "required": ["since", "until"],
+      "additionalProperties": false,
+      "properties": {
+        "since": { "type": "string", "format": "date-time", "description": "Inclusive." },
+        "until": { "type": "string", "format": "date-time", "description": "Exclusive." }
+      }
+    },
+    "status": {
+      "enum": ["ok", "degraded", "failed"],
+      "description": "Health of report GENERATION, not of the product. Product problems belong in the risks section."
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "description": "Exactly six, in this order. An empty section keeps its key with body 'none' — never omit.",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "body"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "enum": [
+              "intent_vs_actual",
+              "shipped",
+              "needs_founder",
+              "autopilot",
+              "risks",
+              "ask"
+            ]
+          },
+          "title": { "type": "string", "minLength": 1 },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Markdown. Use the literal string 'none' when there is nothing to report."
+          },
+          "items": {
+            "type": "array",
+            "description": "Optional links (PRs, tasks, dashboards).",
+            "items": {
+              "type": "object",
+              "required": ["text"],
+              "additionalProperties": false,
+              "properties": {
+                "text": { "type": "string", "minLength": 1 },
+                "url": { "type": "string", "format": "uri" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
