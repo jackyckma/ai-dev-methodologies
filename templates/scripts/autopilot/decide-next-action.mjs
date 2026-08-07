@@ -53,6 +53,27 @@ function sh(cmd) {
   }
 }
 
+function emit(obj) {
+  process.stdout.write(JSON.stringify(obj, null, 2) + "\n");
+  process.exit(0);
+}
+
+// --- Preflight: is this repo actually fueled? ---------------------------------
+// A repo can have Cursor Automations wired before (or long after) it has
+// docs/autopilot/ scaffolds — e.g. a new project where the founder set up the
+// two Automations first. That is NOT an error, and it is NOT license to
+// improvise: an unattended agent that finds no queue must do nothing at all.
+// Returning IDLE here means an unfueled repo costs exactly one command per tick
+// and leaves no trace, so Automations can stay switched on permanently.
+if (!(await exists(ap("backlog.json"))) && !(await exists(ap("roadmap.json")))) {
+  emit({
+    lane: laneArg,
+    action: "IDLE",
+    reason:
+      "no-autopilot-scaffolds: docs/autopilot/{backlog,roadmap}.json are absent, so this repo has no approved work. Stop now. Do NOT create scaffolds, open issues, or infer tasks from the codebase — fueling a repo is a founder decision.",
+  });
+}
+
 const pause = await loadJson(ap("pause-state.json"), { paused: false });
 const paused = pause.paused === true;
 const pauseBy = pause.by ?? null;
@@ -138,4 +159,4 @@ if (laneArg === "maker") {
   });
 }
 
-process.stdout.write(JSON.stringify(result, null, 2) + "\n");
+emit(result);
