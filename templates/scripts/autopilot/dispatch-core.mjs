@@ -32,21 +32,59 @@ export function extractAutopilotTaskId(title) {
 }
 
 /**
+ * Normalise a PR reference to a number.
+ *
+ * `locks.json` lease.pr is written by the Maker, and the playbook did not
+ * originally pin its format — in practice agents have written all three of
+ * `609`, `"609"` and `"https://github.com/owner/repo/pull/609"`. Accept all.
+ *
+ * @param {unknown} value
+ * @returns {number|null} the PR number, or null if it cannot be determined
+ */
+export function parsePrNumber(value) {
+  if (value == null) return null;
+  if (typeof value === "number") return Number.isInteger(value) ? value : null;
+  const text = String(value).trim();
+  if (text === "") return null;
+  if (/^\d+$/.test(text)) return Number(text);
+  const fromUrl = text.match(/\/pull\/(\d+)/);
+  if (fromUrl) return Number(fromUrl[1]);
+  const bareHash = text.match(/^#(\d+)$/);
+  if (bareHash) return Number(bareHash[1]);
+  return null;
+}
+
+/**
  * A PR is stale when its task is already done on main, or main's locks.json
  * leases a *different* PR for the same task id (duplicate Maker run).
+ *
+ * SAFETY RULE: if the lease exists but its PR reference cannot be parsed, this
+ * returns FALSE — "unknown" must never be read as "superseded". Closing a
+ * healthy PR is destructive and cannot be undone by the loop; sending it to
+ * REVIEW instead costs one tick. A previous version did `Number(lease.pr)`,
+ * which yields NaN for a URL, and `NaN !== 6` is true — so every oldest PR
+ * looked superseded, CLOSE_STALE was proposed ahead of REVIEW on every tick,
+ * the Checker agent correctly refused at the playbook gate, and the lane
+ * deadlocked with PRs accumulating for days.
+ *
  * @param {OpenPR} pr
- * @param {{ tasksById: Map<string, Task>, locks?: Record<string, { pr?: number|null }> }} ctx
+ * @param {{ tasksById: Map<string, Task>, locks?: Record<string, { pr?: number|string|null }> }} ctx
  */
 export function isPrSuperseded(pr, ctx) {
   const taskId = extractAutopilotTaskId(pr.title);
   if (!taskId) return false;
   const task = ctx.tasksById.get(taskId);
   if (task?.status === "done") return true;
+
   const lease = ctx.locks?.[taskId];
-  if (lease != null && lease.pr != null && Number(lease.pr) !== Number(pr.number)) {
-    return true;
-  }
-  return false;
+  if (lease == null || lease.pr == null) return false;
+
+  const leasedPr = parsePrNumber(lease.pr);
+  if (leasedPr == null) return false; // unparseable → not a superseded signal
+  const thisPr = parsePrNumber(pr.number);
+  if (thisPr == null) return false;
+
+  return leasedPr !== thisPr;
 }
 
 /**
@@ -101,7 +139,7 @@ export function decideMaker(state) {
  *   pauseBy?: string|null,
  *   openPRs:OpenPR[],
  *   tasks?: Task[],
- *   locks?: Record<string, { pr?: number|null }>,
+ *   locks?: Record<string, { pr?: number|string|null }>,
  *   mainShaChanged:boolean,
  *   dailyReportDue:boolean,
  *   weeklyReportDue:boolean,
