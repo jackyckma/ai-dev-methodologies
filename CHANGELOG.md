@@ -6,6 +6,125 @@ Format based on [Keep a Changelog](https://keepachangelog.com/). Version follows
 
 **Maintainers:** see [CHANGELOG-GUIDE.md](CHANGELOG-GUIDE.md) for release checklist and entry template.
 
+## [1.7.0] - 2026-08-16
+
+Autopilot stall safety net, plus a retroactive entry for the deadlock fix that
+shipped 2026-08-09 without one. Reconstructed from actual commit history
+(`git log`), not from memory — see the note at the end of this entry.
+
+### Added — stall safety net (`FORCE_NEEDS_HUMAN`)
+
+Motivation: `locks.json.since` already records when Maker leases a task, before
+anything that could crash. A normal `IMPLEMENT` or `REVIEW` finishes in one
+tick (minutes); if a lock sits past a threshold with its task still in the
+state that lock represents, every run that touched it must have crashed before
+reaching the playbook's own bounce-to-`ready` / bounce-to-`needs_human` step —
+so the normal retry/escalation bookkeeping never got a chance to fire, and
+without a check the same lock gets silently re-picked (Maker) or silently
+ignored (Checker, head-of-line blocking the whole PR queue) forever.
+
+- `templates/scripts/autopilot/dispatch-core.mjs` — `findStaleLock()` (pure,
+  takes `nowMs` and a threshold, no IO) checks `locks.json.since` against a
+  configurable `staleHours`. `decideMaker` runs it first, ahead of picking new
+  work (`statusMatch: "in_progress"`). `decideChecker` runs it first too
+  (`statusMatch: "in_review"`), and PRs whose task is already `needs_human` are
+  filtered out of the REVIEW-picking queue so later PRs get a turn instead of
+  the FIFO order re-picking the same stuck one.
+- `templates/scripts/autopilot/decide-next-action.mjs` — new env var
+  `STALE_LOCK_HOURS` (default 4), passes `locks` + `nowMs` through to both
+  lanes.
+- `templates/docs/autopilot/playbook.md` — new `FORCE_NEEDS_HUMAN` action for
+  both lanes: clear the lock, set the task `needs_human`, append `feedback`,
+  push. Checker's version explicitly leaves the PR itself open and untouched —
+  never merge or close on a failure it can't diagnose. New §0 note: receiving
+  this action is the loop working correctly, not a fault to route around.
+
+No new persisted counters and no extra commits on the happy path — reuses a
+timestamp `locks.json` already had for a different purpose, and only writes
+anything once a lock has actually gone stale.
+
+### Fixed (retroactive — actually shipped 2026-08-09, undocumented until now)
+
+- `templates/scripts/autopilot/dispatch-core.mjs` — `isPrSuperseded` did
+  `Number(lease.pr)`, which is `NaN` for a URL, and `NaN !== 6` is `true` — so
+  whenever a Maker run wrote `locks.json` lease.pr as a full PR URL instead of
+  a bare number, the oldest open PR always looked superseded. `decideChecker`
+  checks `CLOSE_STALE` before `REVIEW`, so every tick proposed closing a
+  healthy PR; the Checker agent correctly refused at the playbook gate and
+  stopped, so the lane never reached `REVIEW` and PRs piled up for days while
+  Makers kept producing more. New `parsePrNumber()` accepts a bare number,
+  numeric string, or PR URL, and returns `null` (never a false "superseded")
+  when it can't be parsed — ambiguity falls toward the safe action (review),
+  never the destructive one (close). This is the incident referenced in
+  orbita's `docs/autopilot/pause-state.json` `_last_incident`.
+
+**This fix landed in the template on 2026-08-09 but at least one project
+(orbita) never received it in a sync** — its `dispatch-core.mjs` still had the
+vulnerable `Number(lease.pr)` line as of 2026-08-16, seven days later. The
+`locks.json` *data* had been hand-corrected to integers at the time, which
+masked the gap: the bug only resurfaces the next time a lease is written as a
+URL. Worth an audit of which other projects are in the same state.
+
+### Migration
+
+- **Bundle files:** re-sync `dispatch-core.mjs`, `decide-next-action.mjs`,
+  `playbook.md`.
+- **Cursor UI:** none — `FORCE_NEEDS_HUMAN` is executed by the same
+  Maker/Checker prompts already pasted; no new Automation or trigger needed.
+- **Existing `locks.json` data:** no migration; `since` already exists on every
+  lease this bundle has ever written.
+- Tune `STALE_LOCK_HOURS` per project if a repo's normal `IMPLEMENT`/`REVIEW`
+  genuinely takes longer than a few minutes; default 4h assumes it doesn't.
+
+### Notify text
+
+> Methodology updated to **v1.7.0**. Autopilot dispatcher gets a stall safety
+> net: a lock stuck past `STALE_LOCK_HOURS` (default 4h) auto-escalates to
+> `needs_human` instead of silently retrying forever or blocking the PR queue
+> behind it — re-sync `dispatch-core.mjs`, `decide-next-action.mjs`,
+> `playbook.md`. Also: the 2026-08-09 lease-URL deadlock fix is now properly
+> documented here — **check whether your project's `dispatch-core.mjs` ever
+> actually received it**; `locks.json` data being correct does not mean the
+> code fix landed.
+
+## [1.6.0] - 2026-08-07
+
+Report contract → schema/contract v1.2: a third, independent report line for
+deployment status.
+
+### Added
+
+- `instructions/portfolio-hub-reporting.md` — **deploy edge**, alongside repo
+  and runtime. Motivation: a merge marks a task done, but if the build fails
+  the code never reaches production, and a prod smoke can still pass against
+  the *previous* successful deployment — the failed release is the easiest
+  kind of failure to miss. Nobody in the product repo produces this; the hub
+  collects it from the hosting platform's API. Only the runtime edge needs
+  per-project work — repo is already in git, deploy is one platform
+  credential — so most projects implement nothing at all to get all three
+  lines.
+- `templates/docs/autopilot/report.schema.json` — `edge` accepts `deploy`;
+  `schema_version` accepts `1.2` alongside `1.0`/`1.1`. Additive: every 1.0/1.1
+  payload is still valid.
+
+### Migration
+
+- **Bundle files:** re-sync `portfolio-hub-reporting.md`, `report.schema.json`.
+- **Report payloads:** none required; `deploy` is a new optional edge value.
+
+### Notify text
+
+> Methodology updated to **v1.6.0**. Report contract → **v1.2**: adds a
+> **deploy** edge (build/release status from the hosting platform) alongside
+> repo and runtime — no payload migration needed, 1.0/1.1 stay valid.
+
+---
+
+*Editorial note on this entry and 1.7.0's retroactive section: `VERSION` was
+bumped to 1.6.0 on 2026-08-07 but this file was never updated to match — the
+gap was flagged in a hub session-handoff note and closed here on 2026-08-16 by
+reconstructing from `git log` rather than from memory of what changed.*
+
 ## [1.5.0] - 2026-08-07
 
 Two corrections to 1.4.0, plus making Autopilot Automations safe to leave switched on permanently.
