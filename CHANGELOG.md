@@ -6,6 +6,37 @@ Format based on [Keep a Changelog](https://keepachangelog.com/). Version follows
 
 **Maintainers:** see [CHANGELOG-GUIDE.md](CHANGELOG-GUIDE.md) for release checklist and entry template.
 
+## [1.8.0] - 2026-08-17
+
+Extends the 1.7.0 stall safety net: Checker now also catches a Maker-side stall, not only its own.
+
+### Changed
+
+- `templates/scripts/autopilot/dispatch-core.mjs` — `decideChecker` now also runs `findStaleLock` with
+  `statusMatch: "in_progress"` (Maker's own domain), in addition to its existing `"in_review"` check.
+  Motivation: on projects where Maker only runs once or twice a day (increasingly common after founders
+  moved most schedules to off-hours), waiting for Maker's own next tick to notice its own crashed lock
+  could take most of a day. Checker ticks far more often on most projects — event-triggered on every new
+  draft PR (`Draft opened`), plus its own schedule — so it is the practical place to catch this sooner.
+  This does not blur the "Checker never writes feature code" boundary: `FORCE_NEEDS_HUMAN` only clears a
+  lock and flips a status, the identical administrative escalation Maker would perform on itself; Checker
+  is simply often the first lane to get a chance to run it. `decideMaker` keeps its own `in_progress`
+  check too, so Maker still self-heals on a project with no Checker traffic at all.
+- No changes to `decide-next-action.mjs` or `playbook.md` — the existing `FORCE_NEEDS_HUMAN` action,
+  wiring, and payload shape are unchanged; only which lane's dispatcher can emit it for which lock state.
+
+### Migration
+
+- **Bundle files:** re-sync `dispatch-core.mjs` only.
+- **Cursor UI:** none.
+
+### Notify text
+
+> Methodology updated to **v1.8.0**. Checker's stall safety net now also catches a stuck Maker lock, not
+> just its own — useful once your schedules move Maker to once/twice-daily off-hours ticks, since Checker
+> (event-triggered on `Draft opened`) gets far more chances to notice sooner. Re-sync `dispatch-core.mjs`
+> only.
+
 ## [1.7.0] - 2026-08-16
 
 Autopilot stall safety net, plus a retroactive entry for the deadlock fix that
