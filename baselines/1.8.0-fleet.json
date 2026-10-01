@@ -1,0 +1,9 @@
+{
+  "id": "1.8.0-fleet",
+  "git_ref": "hand-written",
+  "commit_time": "2026-08-17T14:03:21+02:00",
+  "note": "comment-only variant of 1.8.0 dispatch-core.mjs found identically in 5 project repos on 2026-10-01; no behaviour difference",
+  "files": {
+    "templates/scripts/autopilot/dispatch-core.mjs": "ce72dd9f9858c2f7c6d0bf54382d90e2a55385dc1be71c1b6660a01b5ef81978"
+  }
+}

@@ -15,6 +15,8 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { loadBaselines } from "../lib/baselines.mjs";
+import { classifyProject } from "../lib/classify.mjs";
 import { sha256 } from "../lib/hash.mjs";
 import { lockToData, serializeLock } from "../lib/lockfile.mjs";
 import { isActionable, isGlobDest, loadManifest } from "../lib/manifest.mjs";
@@ -149,6 +151,67 @@ test("historical baselines hash the git blobs and skip paths that did not exist"
   const sample = "instructions/karpathy-guidelines.md";
   assert.equal(b12.files[sample], sha256(blob(`${b12.commit}:${sample}`)));
   assert.equal(b18.files[sample], sha256(blob(`${b18.commit}:${sample}`)));
+});
+
+test("every baseline parses, and a baseline without commit still loads and classifies", () => {
+  const manifest = loadManifest(ROOT);
+  const sources = new Set(manifest.entries.map((entry) => entry.source).filter(Boolean));
+  const names = readdirSync(path.join(ROOT, "baselines")).filter((name) => name.endsWith(".json"));
+  assert.ok(names.includes("1.8.0-fleet.json"));
+  for (const name of names) {
+    const doc = JSON.parse(readFileSync(path.join(ROOT, "baselines", name), "utf8"));
+    assert.equal(typeof doc.id, "string");
+    assert.ok(doc.id.length > 0);
+    assert.equal(typeof doc.files, "object");
+    assert.ok(!Array.isArray(doc.files));
+    for (const [key, value] of Object.entries(doc.files)) {
+      assert.ok(sources.has(key), `${name} files key is not a manifest source: ${key}`);
+      assert.match(value, /^[0-9a-f]{64}$/);
+    }
+  }
+
+  const loaded = loadBaselines(ROOT);
+  const fleet = loaded.find((baseline) => baseline.id === "1.8.0-fleet");
+  const v180 = loaded.find((baseline) => baseline.id === "1.8.0");
+  assert.ok(fleet);
+  assert.equal(Object.hasOwn(fleet, "commit"), false);
+  assert.equal(fleet.commit_time, v180.commit_time);
+  const fleetAt = loaded.findIndex((baseline) => baseline.id === "1.8.0-fleet");
+  const v180At = loaded.findIndex((baseline) => baseline.id === "1.8.0");
+  assert.ok(v180At >= 0 && fleetAt === v180At + 1);
+
+  const dir = tempDir();
+  try {
+    const dest = "scripts/autopilot/dispatch-core.mjs";
+    const source = "templates/scripts/autopilot/dispatch-core.mjs";
+    const current = readFileSync(path.join(ROOT, source));
+    write(dir, dest, Buffer.concat([current, Buffer.from("\n// not the fleet bytes\n")]));
+    const modified = classifyProject(ROOT, dir, manifest, loaded).find((row) => row.dest === dest);
+    assert.equal(modified.state, "MODIFIED");
+    assert.notEqual(modified.closest_baseline, "1.8.0-fleet");
+    assert.ok(loaded.some((baseline) => baseline.id === modified.closest_baseline && baseline.commit));
+
+    const variant = Buffer.from("fleet-variant-bytes\n");
+    const synthetic = [
+      {
+        id: "1.8.0",
+        commit_time: fleet.commit_time,
+        commit: v180.commit,
+        files: { [source]: sha256(current) },
+      },
+      {
+        id: "no-commit",
+        commit_time: fleet.commit_time,
+        files: { [source]: sha256(variant) },
+      },
+    ];
+    write(dir, dest, variant);
+    const behind = classifyProject(ROOT, dir, manifest, synthetic).find((row) => row.dest === dest);
+    assert.equal(behind.state, "BEHIND");
+    assert.equal(behind.baseline, "no-commit");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test("check-version passes on this repo and fails on a mismatched marker", () => {
