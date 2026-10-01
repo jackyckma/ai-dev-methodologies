@@ -1,0 +1,5 @@
+{
+  "type": "module",
+  "main": "./load.mjs",
+  "description": "Resolves `node --test scripts/__tests__/` to load.mjs, which imports every *.test.mjs. Not an npm package."
+}

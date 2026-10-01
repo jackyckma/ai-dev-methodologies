@@ -1,0 +1,367 @@
+{
+  "schema_version": 1,
+  "framework_version": "1.9.0",
+  "entries": [
+    {
+      "source": "templates/.agents/README.md",
+      "dest": ".agents/README.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "compatibility/local-vs-cloud-agents.md",
+      "dest": ".agents/compatibility/local-vs-cloud-agents.md",
+      "class": "overwrite",
+      "note": "Bootstrap copies this file. framework-adoption.md §2 did not name it. Class overwrite follows bootstrap."
+    },
+    {
+      "source": "defaults/README.md",
+      "dest": ".agents/defaults/README.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "defaults/ai-providers.md",
+      "dest": ".agents/defaults/ai-providers.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "defaults/cloudflare.md",
+      "dest": ".agents/defaults/cloudflare.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "defaults/zeabur.md",
+      "dest": ".agents/defaults/zeabur.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "METHODOLOGIES.md",
+      "dest": ".agents/instructions/METHODOLOGIES.md",
+      "class": "overwrite",
+      "note": "Judged overwrite, not merge. Adoption lists it as safe to replace. It is the canonical catalog. A modified project copy is still not overwritten; sync writes a patch."
+    },
+    {
+      "source": "instructions/README.md",
+      "dest": ".agents/instructions/README.md",
+      "class": "merge",
+      "note": "Bootstrap copies instructions/*.md, including this index. Adoption §2 did not name it. Judged merge because a project may extend the index when it adds local instructions."
+    },
+    {
+      "source": "instructions/agent-native-practices.md",
+      "dest": ".agents/instructions/agent-native-practices.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "instructions/agent-tooling-guardrails.md",
+      "dest": ".agents/instructions/agent-tooling-guardrails.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "instructions/autonomous-loop.md",
+      "dest": ".agents/instructions/autonomous-loop.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "instructions/cursor-autopilot.md",
+      "dest": ".agents/instructions/cursor-autopilot.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "instructions/decision-authority.md",
+      "dest": ".agents/instructions/decision-authority.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "instructions/framework-adoption.md",
+      "dest": ".agents/instructions/framework-adoption.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "instructions/framework-evolution.md",
+      "dest": ".agents/instructions/framework-evolution.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "instructions/issue-quality.md",
+      "dest": ".agents/instructions/issue-quality.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "instructions/judgment-rubrics.md",
+      "dest": ".agents/instructions/judgment-rubrics.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "instructions/karpathy-guidelines.md",
+      "dest": ".agents/instructions/karpathy-guidelines.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "instructions/lane-based-development.md",
+      "dest": ".agents/instructions/lane-based-development.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "instructions/model-orchestration.md",
+      "dest": ".agents/instructions/model-orchestration.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "instructions/portfolio-hub-reporting.md",
+      "dest": ".agents/instructions/portfolio-hub-reporting.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "templates/project-guidelines.template.md",
+      "dest": ".agents/instructions/project-guidelines.md",
+      "class": "templated",
+      "note": "Bootstrap copies the template once. Projects fill it in. Sync never copies it."
+    },
+    {
+      "source": "instructions/session-handoff.md",
+      "dest": ".agents/instructions/session-handoff.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "templates/.agents/METHODOLOGY.lock",
+      "dest": ".agents/METHODOLOGY.lock",
+      "class": "templated",
+      "note": "Bootstrap writes a generated lock (version, commit, date), not a byte copy. framework-sync --apply rewrites schema v2 in place and does not copy this template."
+    },
+    {
+      "source": "templates/.agents/skills/README.md",
+      "dest": ".agents/skills/README.md",
+      "class": "overwrite",
+      "note": "Bootstrap copies the skills README. Adoption §2 names SKILL.md only. Class overwrite follows bootstrap."
+    },
+    {
+      "source": "templates/.agents/skills/complexity-review/SKILL.md",
+      "dest": ".agents/skills/complexity-review/SKILL.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "templates/.agents/skills/deferred-shortcuts/SKILL.md",
+      "dest": ".agents/skills/deferred-shortcuts/SKILL.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "",
+      "dest": ".agents/skills/lane-*/SKILL.md",
+      "class": "project",
+      "note": "Named in framework-adoption.md §2. Bootstrap does not copy lane skills. No upstream source."
+    },
+    {
+      "source": "templates/.cursor/rules/shared-instructions.mdc",
+      "dest": ".cursor/rules/shared-instructions.mdc",
+      "class": "merge",
+      "note": "Adoption §2 lists this file under both framework-owned and hybrid. Class merge."
+    },
+    {
+      "source": "templates/AGENTS.md",
+      "dest": "AGENTS.md",
+      "class": "merge",
+      "note": "Adoption lists the entry point as safe to replace. Class merge because projects add local notes. An unmodified baseline copy is still replaced on --apply."
+    },
+    {
+      "source": "templates/CLAUDE.md",
+      "dest": "CLAUDE.md",
+      "class": "merge",
+      "note": "Same judgment as AGENTS.md."
+    },
+    {
+      "source": "compatibility/agent-capability-matrix.template.md",
+      "dest": "docs/AGENT_ENV.md",
+      "class": "templated",
+      "note": "Bootstrap copies the capability-matrix template to this dest. Projects fill verification commands and the staging URL."
+    },
+    {
+      "source": "templates/docs/CURRENT_STATUS.md",
+      "dest": "docs/CURRENT_STATUS.md",
+      "class": "project"
+    },
+    {
+      "source": "templates/docs/README.md",
+      "dest": "docs/README.md",
+      "class": "merge",
+      "note": "Bootstrap copies the docs index. Adoption calls it hybrid (project content, take new sections). Class merge."
+    },
+    {
+      "source": "templates/docs/SESSION_HANDOFF.md",
+      "dest": "docs/SESSION_HANDOFF.md",
+      "class": "project",
+      "note": "Adoption lists this under both project-owned and hybrid. 1.9.0 class is project: sync never touches it."
+    },
+    {
+      "source": "templates/docs/autopilot/README.md",
+      "dest": "docs/autopilot/README.md",
+      "class": "overwrite"
+    },
+    {
+      "source": "templates/docs/autopilot/automations.md",
+      "dest": "docs/autopilot/automations.md",
+      "class": "merge",
+      "note": "Adoption lists this as safe to replace. Projects cherry-pick and edit it. Class merge."
+    },
+    {
+      "source": "templates/docs/autopilot/backlog.json",
+      "dest": "docs/autopilot/backlog.json",
+      "class": "project"
+    },
+    {
+      "source": "templates/docs/autopilot/decisions.json",
+      "dest": "docs/autopilot/decisions.json",
+      "class": "project"
+    },
+    {
+      "source": "templates/docs/autopilot/lessons.md",
+      "dest": "docs/autopilot/lessons.md",
+      "class": "project",
+      "note": "Bootstrap copies the empty template. Adoption §2 does not name it. It is an append-only project log, so sync never overwrites it."
+    },
+    {
+      "source": "templates/docs/autopilot/locks.json",
+      "dest": "docs/autopilot/locks.json",
+      "class": "ignore",
+      "note": "Runtime lease file. Sync never writes it. --apply refuses while a lease is active."
+    },
+    {
+      "source": "templates/docs/autopilot/pause-state.json",
+      "dest": "docs/autopilot/pause-state.json",
+      "class": "ignore",
+      "note": "Runtime kill-switch. Sync never writes it. A non-paused file produces a warning, not a refusal."
+    },
+    {
+      "source": "templates/docs/autopilot/planner-preferences.md",
+      "dest": "docs/autopilot/planner-preferences.md",
+      "class": "project",
+      "note": "Filled planner preferences are project-owned even though bootstrap copies the blank template."
+    },
+    {
+      "source": "templates/docs/autopilot/playbook.md",
+      "dest": "docs/autopilot/playbook.md",
+      "class": "merge",
+      "note": "Adoption lists this as safe to replace. Projects cherry-pick and edit it. Class merge."
+    },
+    {
+      "source": "templates/docs/autopilot/project-hooks.json",
+      "dest": "docs/autopilot/project-hooks.json",
+      "class": "project",
+      "note": "Adoption says merge new keys by hand. 1.9.0 does not auto-merge JSON. Class project."
+    },
+    {
+      "source": "templates/docs/autopilot/report.example.json",
+      "dest": "docs/autopilot/report.example.json",
+      "class": "overwrite"
+    },
+    {
+      "source": "templates/docs/autopilot/report.schema.json",
+      "dest": "docs/autopilot/report.schema.json",
+      "class": "overwrite"
+    },
+    {
+      "source": "",
+      "dest": "docs/autopilot/reports/**",
+      "class": "ignore",
+      "note": "Generated report output. No upstream source. Sync never writes under reports/."
+    },
+    {
+      "source": "templates/docs/autopilot/reports/README.md",
+      "dest": "docs/autopilot/reports/README.md",
+      "class": "ignore",
+      "note": "Bootstrap copies this scaffold, but it lives under reports/**, which sync never touches."
+    },
+    {
+      "source": "templates/docs/autopilot/roadmap.json",
+      "dest": "docs/autopilot/roadmap.json",
+      "class": "project"
+    },
+    {
+      "source": "templates/docs/autopilot/watchdog-state.json",
+      "dest": "docs/autopilot/watchdog-state.json",
+      "class": "ignore",
+      "note": "Runtime state. Bootstrap copies an empty template. Adoption §2 does not name it. Sync never writes it."
+    },
+    {
+      "source": "",
+      "dest": "docs/errors-and-learnings.md",
+      "class": "project",
+      "note": "Named in framework-adoption.md §2. Not copied by bootstrap."
+    },
+    {
+      "source": "",
+      "dest": "docs/product-*.md",
+      "class": "project",
+      "note": "Named in framework-adoption.md §2. Not copied by bootstrap."
+    },
+    {
+      "source": "",
+      "dest": "docs/project-progress.md",
+      "class": "project",
+      "note": "Named in framework-adoption.md §2. Not copied by bootstrap."
+    },
+    {
+      "source": "",
+      "dest": "docs/traceability-index.md",
+      "class": "project",
+      "note": "Named in framework-adoption.md §2. Not copied by bootstrap."
+    },
+    {
+      "source": "",
+      "dest": "packages/**/INTERFACE.md",
+      "class": "project",
+      "note": "Named in framework-adoption.md §2. Not copied by bootstrap."
+    },
+    {
+      "source": "templates/scripts/agent-verify.sh",
+      "dest": "scripts/agent-verify.sh",
+      "class": "templated",
+      "note": "Projects set VERIFY_L0 / VERIFY_L1. Sync never copies it."
+    },
+    {
+      "source": "templates/scripts/autopilot/apply-decision-defaults.mjs",
+      "dest": "scripts/autopilot/apply-decision-defaults.mjs",
+      "class": "overwrite"
+    },
+    {
+      "source": "templates/scripts/autopilot/decide-next-action.mjs",
+      "dest": "scripts/autopilot/decide-next-action.mjs",
+      "class": "merge",
+      "note": "Adoption groups every autopilot mjs as safe to replace. This file is merge because projects diverge. An unmodified baseline copy, including one that lacks the 1.5 no-autopilot-scaffolds preflight, is still replaced on --apply."
+    },
+    {
+      "source": "templates/scripts/autopilot/deploy-watchdog.mjs",
+      "dest": "scripts/autopilot/deploy-watchdog.mjs",
+      "class": "overwrite"
+    },
+    {
+      "source": "templates/scripts/autopilot/dispatch-core.mjs",
+      "dest": "scripts/autopilot/dispatch-core.mjs",
+      "class": "overwrite",
+      "note": "Class overwrite per the 1.9.0 scope. A modified project copy is not overwritten; sync writes a patch."
+    },
+    {
+      "source": "templates/scripts/autopilot/queue-status.mjs",
+      "dest": "scripts/autopilot/queue-status.mjs",
+      "class": "overwrite"
+    },
+    {
+      "source": "templates/scripts/autopilot/render-report.mjs",
+      "dest": "scripts/autopilot/render-report.mjs",
+      "class": "overwrite"
+    },
+    {
+      "source": "templates/scripts/autopilot/verify-all.mjs",
+      "dest": "scripts/autopilot/verify-all.mjs",
+      "class": "overwrite"
+    },
+    {
+      "source": "templates/scripts/autopilot/weekly-report.mjs",
+      "dest": "scripts/autopilot/weekly-report.mjs",
+      "class": "overwrite"
+    },
+    {
+      "source": "scripts/setup-cloud-agent-env.sh",
+      "dest": "scripts/setup-cloud-agent-env.sh",
+      "class": "overwrite"
+    }
+  ]
+}
