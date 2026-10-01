@@ -492,6 +492,81 @@ test("--check exit codes: ok, behind, modified-since-sync, missing; check does n
   }
 });
 
+test("customized_files pass --check; edits, unlisted divergence, and absence do not", () => {
+  const dir = tempDir();
+  try {
+    const manifest = loadManifest(ROOT);
+    for (const entry of manifest.entries) {
+      if (!isActionable(entry) || isGlobDest(entry.dest)) continue;
+      write(dir, entry.dest, readFileSync(path.join(ROOT, entry.source)));
+    }
+    const agents = "AGENTS.md";
+    const play = "docs/autopilot/playbook.md";
+    const customized = [
+      ".agents/instructions/project-guidelines.md",
+      "docs/AGENT_ENV.md",
+      "scripts/agent-verify.sh",
+      agents,
+    ];
+    write(
+      dir,
+      ".agents/METHODOLOGY.lock",
+      V1_LOCK.replace("  - scripts/agent-verify.sh\n", "  - scripts/agent-verify.sh\n  - AGENTS.md\n"),
+    );
+    write(dir, "docs/autopilot/pause-state.json", '{"paused":true}\n');
+    initRepo(dir);
+
+    write(dir, agents, `${readFileSync(path.join(dir, agents), "utf8")}local agents content\n`);
+    const relock = node(["scripts/framework-sync.mjs", "--project", dir, "--relock", "--allow-dirty"]);
+    assert.equal(relock.status, 0, relock.stderr);
+    const locked = lockToData(readFileSync(path.join(dir, ".agents/METHODOLOGY.lock"), "utf8"));
+    assert.deepEqual(locked.lists.customized_files, customized);
+    assert.equal(locked.lists.customized_files.includes(play), false);
+    const agentsHash = sha256(readFileSync(path.join(dir, agents)));
+    assert.equal(locked.maps.files[agents], agentsHash);
+
+    const passed = node(["scripts/framework-sync.mjs", "--project", dir, "--check", "--json"]);
+    assert.equal(passed.status, 0, passed.stderr);
+    const passedBody = JSON.parse(passed.stdout);
+    assert.equal(passedBody.ok, true);
+    const customRow = passedBody.results.find((row) => row.dest === agents);
+    assert.equal(customRow.result, "customized");
+    assert.equal(customRow.detail, "listed in customized_files; matches lock; template not compared");
+    const human = node(["scripts/framework-sync.mjs", "--project", dir, "--check"]);
+    assert.equal(human.status, 0, human.stderr);
+    assert.match(human.stdout, /customized: listed in customized_files; matches lock; template not compared/);
+
+    write(dir, agents, `${readFileSync(path.join(dir, agents), "utf8")}edited after relock\n`);
+    const edited = node(["scripts/framework-sync.mjs", "--project", dir, "--check", "--json"]);
+    assert.equal(edited.status, 1);
+    assert.equal(
+      JSON.parse(edited.stdout).results.find((row) => row.dest === agents).result,
+      "modified-since-sync",
+    );
+
+    write(dir, agents, readFileSync(path.join(ROOT, "templates/AGENTS.md")));
+    write(dir, agents, Buffer.concat([readFileSync(path.join(dir, agents)), Buffer.from("local agents content\n")]));
+    assert.equal(sha256(readFileSync(path.join(dir, agents))), agentsHash);
+    const playSrc = readFileSync(path.join(ROOT, "templates/docs/autopilot/playbook.md"));
+    write(dir, play, Buffer.concat([playSrc, Buffer.from("local playbook\n")]));
+    const relockPlay = node(["scripts/framework-sync.mjs", "--project", dir, "--relock"]);
+    assert.equal(relockPlay.status, 0, relockPlay.stderr);
+    const afterPlay = lockToData(readFileSync(path.join(dir, ".agents/METHODOLOGY.lock"), "utf8"));
+    assert.deepEqual(afterPlay.lists.customized_files, customized);
+    const behind = node(["scripts/framework-sync.mjs", "--project", dir, "--check", "--json"]);
+    assert.equal(behind.status, 1);
+    assert.equal(JSON.parse(behind.stdout).results.find((row) => row.dest === play).result, "behind");
+    assert.equal(JSON.parse(behind.stdout).results.find((row) => row.dest === agents).result, "customized");
+
+    rmSync(path.join(dir, agents));
+    const missing = node(["scripts/framework-sync.mjs", "--project", dir, "--check", "--json"]);
+    assert.equal(missing.status, 1);
+    assert.equal(JSON.parse(missing.stdout).results.find((row) => row.dest === agents).result, "missing");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test("bootstrap --force keeps project-state files unless --reset-project-state", () => {
   const dir = tempDir();
   try {

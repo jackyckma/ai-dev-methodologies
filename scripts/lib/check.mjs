@@ -15,6 +15,7 @@ export function checkProject(frameworkRoot, projectRoot, manifest) {
     lockAbsent = true;
   }
   const files = data && data.maps.files ? data.maps.files : null;
+  const customized = new Set(data && data.lists.customized_files ? data.lists.customized_files : []);
   const results = [];
   for (const entry of manifest.entries) {
     if (!isActionable(entry) || isGlobDest(entry.dest)) continue;
@@ -33,15 +34,35 @@ export function checkProject(frameworkRoot, projectRoot, manifest) {
       });
       continue;
     }
+    const fileHash = sha256(destBuf);
+    const lockHash = files && Object.prototype.hasOwnProperty.call(files, entry.dest) ? files[entry.dest] : null;
+    if (customized.has(entry.dest)) {
+      if (lockHash == null || fileHash !== lockHash) {
+        results.push({
+          dest: entry.dest,
+          class: entry.class,
+          result: "modified-since-sync",
+          detail: lockHash == null
+            ? "listed in customized_files; lock has no files hash for this path"
+            : "listed in customized_files; file hash does not match the lock (edited after the last sync)",
+        });
+      } else {
+        results.push({
+          dest: entry.dest,
+          class: entry.class,
+          result: "customized",
+          detail: "listed in customized_files; matches lock; template not compared",
+        });
+      }
+      continue;
+    }
     let srcBuf = null;
     try {
       srcBuf = readFileSync(path.join(frameworkRoot, entry.source));
     } catch {
       srcBuf = null;
     }
-    const fileHash = sha256(destBuf);
     const templateHash = srcBuf ? sha256(srcBuf) : null;
-    const lockHash = files && Object.prototype.hasOwnProperty.call(files, entry.dest) ? files[entry.dest] : null;
     if (lockAbsent || lockHash == null) {
       const why = lockAbsent ? "METHODOLOGY.lock is absent" : "lock has no files hash for this path";
       const matches = templateHash !== null && fileHash === templateHash;
@@ -75,5 +96,5 @@ export function checkProject(frameworkRoot, projectRoot, manifest) {
     }
     results.push({ dest: entry.dest, class: entry.class, result: "ok", detail: "" });
   }
-  return { ok: results.every((row) => row.result === "ok"), results };
+  return { ok: results.every((row) => row.result === "ok" || row.result === "customized"), results };
 }

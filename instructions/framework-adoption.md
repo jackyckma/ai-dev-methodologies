@@ -210,7 +210,9 @@ node scripts/framework-sync.mjs --project /path/to/your-project --apply
 
 Modified files are listed as manual merge required. Each patch is `<project>/.framework-sync/<dest>.patch`. Review it and merge by hand. For `scripts/autopilot/decide-next-action.mjs`, an unmodified file that lacks the 1.5 `no-autopilot-scaffolds` preflight is replaced in step 3; a modified file gets that preflight only via the patch.
 
-When the hand-merge makes a file match the template, run `--relock` before committing. A hand-merge leaves the tree dirty; `--relock` is allowed on that tree. It rewrites only `.agents/METHODOLOGY.lock` (the `files` sha256 map, plus `version`, `source_commit`, `synced_at`, `lock_schema`, and `manifest_version`) and keeps `customized_files` and any other existing keys. It does not copy or patch anything else.
+When a hand-merge intentionally keeps local content (typical for `AGENTS.md`, `CLAUDE.md`, `docs/README.md`, `.cursor/rules/shared-instructions.mdc`, `docs/autopilot/automations.md`, `docs/autopilot/playbook.md`, `scripts/autopilot/decide-next-action.mjs`), add that dest path to `customized_files` in `.agents/METHODOLOGY.lock`. The tool does not add paths for you. Then run `--relock`, then `--check`.
+
+When the hand-merge instead makes the file match the template, leave it off `customized_files` and run `--relock` before committing. A hand-merge leaves the tree dirty; `--relock` is allowed on that tree. It rewrites only `.agents/METHODOLOGY.lock` (the `files` sha256 map, plus `version`, `source_commit`, `synced_at`, `lock_schema`, and `manifest_version`) and keeps `customized_files` and any other existing keys. It does not copy or patch anything else.
 
 ```bash
 node scripts/framework-sync.mjs --project /path/to/your-project --relock
@@ -228,7 +230,7 @@ Follow the project's own branch, commit, and PR conventions. Put the lock update
 node scripts/framework-sync.mjs --project /path/to/your-project --check
 ```
 
-Exit 0 only when every `overwrite` and `merge` file matches both the lock's `files` hashes and the current template. Otherwise exit 1 and report each file as `behind`, `modified-since-sync`, or `missing`. The same command is the weekly drift check. `--check` writes nothing.
+Exit 0 when every `overwrite` and `merge` file is `ok` (matches both the lock hash and the current template) or `customized` (listed in `customized_files` and matches the lock hash; the template is not compared). Otherwise exit 1 and report each other file as `behind`, `modified-since-sync`, or `missing`. The lock's `version` field is only a claim. `--check` is the authority on whether a project is current. The same command is the weekly drift check. `--check` writes nothing.
 
 ---
 

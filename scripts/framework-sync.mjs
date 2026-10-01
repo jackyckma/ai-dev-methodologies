@@ -193,6 +193,7 @@ function renderCheck(report) {
     const detail = row.detail ? `  ${row.detail}` : "";
     return `${row.result.padEnd(22)} ${row.dest}${detail}`;
   });
+  lines.push("customized: listed in customized_files; matches lock; template not compared");
   lines.push(report.ok ? "check: OK" : "check: FAIL");
   return lines.join("\n") + "\n";
 }

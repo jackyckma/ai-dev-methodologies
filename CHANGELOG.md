@@ -24,7 +24,8 @@ Measurement, sync tooling, and version hygiene. No methodology wording changes a
 - `VERSION` → 1.9.0. **no action** (not copied into projects).
 - `README.md` version line, root `AGENTS.md` version fact. **no action** (projects use `templates/docs/README.md` and `templates/AGENTS.md`, which this release does not edit).
 - `METHODOLOGIES.md` version table — copied to `.agents/instructions/METHODOLOGIES.md`. **auto: overwrite** when the project file matches a known baseline; **manual merge** when it does not.
-- `instructions/framework-adoption.md` §2–§3 — copied to `.agents/instructions/framework-adoption.md`. The manifest is the authority for file class; §3 is dry-run → empty locks and consider pausing → `--apply` → hand-merge `.framework-sync/*.patch` → `--relock` → commit / PR per the project's own conventions → `--check`. Delete `.framework-sync/` once the patches are merged. **auto: overwrite** if the project file matches a known baseline; **manual merge** if the project has edited it.
+- `instructions/framework-adoption.md` §2–§3 — copied to `.agents/instructions/framework-adoption.md`. The manifest is the authority for file class; §3 is dry-run → empty locks and consider pausing → `--apply` → hand-merge `.framework-sync/*.patch` → list kept local paths in `customized_files` → `--relock` → `--check` → commit / PR per the project's own conventions. Delete `.framework-sync/` once the patches are merged. **auto: overwrite** if the project file matches a known baseline; **manual merge** if the project has edited it.
+- `--check` — a merge or overwrite path listed in `customized_files` is current when it matches the lock hash, even if it differs from the template. Paths not listed still must match both. The lock `version` is only a claim; `--check` is the authority. **no action** until those paths are listed.
 - `templates/.agents/METHODOLOGY.lock` and the lock written by `scripts/bootstrap-project.sh` now include lock schema v2 scalars (`lock_schema`, `manifest_version`). **no action** on an existing project lock until `framework-sync.mjs --apply`, which rewrites `.agents/METHODOLOGY.lock` in place: keeps `customized_files` and other existing keys, and sets `files` to sha256 of each overwrite/merge file as it then exists. The template is not byte-copied over the project lock.
 - `scripts/bootstrap-project.sh` — `--force` no longer overwrites project-state files (autopilot JSON state, an existing `.agents/METHODOLOGY.lock`, `project-guidelines.md`, `docs/AGENT_ENV.md`, `scripts/agent-verify.sh`, `docs/CURRENT_STATUS.md`, `docs/SESSION_HANDOFF.md`, filled `planner-preferences.md`) unless `--reset-project-state` is also passed. A first bootstrap with no lock still writes one. **no action** for projects that do not re-run bootstrap. Updates go through `framework-sync`.
 
@@ -40,8 +41,7 @@ Measurement, sync tooling, and version hygiene. No methodology wording changes a
 
 1. From a checkout of this repo, dry-run `node scripts/framework-sync.mjs --project <project>`.
 2. Confirm `docs/autopilot/locks.json` has no active lease. Consider pausing the autopilot.
-3. `--apply`, review `.framework-sync/*.patch`, hand-merge, run `--relock` so the lock hash matches the merged bytes, then commit and open a PR using that project's own conventions. Delete `.framework-sync/` once the patches are merged.
-4. `node scripts/framework-sync.mjs --project <project> --check`.
+3. `--apply`, review `.framework-sync/*.patch`, hand-merge. List each path that intentionally keeps local content in `customized_files` in `.agents/METHODOLOGY.lock`, then `--relock`, then `--check`. The lock's `version` field is only a claim; `--check` is the authority on whether the project is current. Commit and open a PR using that project's own conventions. Delete `.framework-sync/` once the patches are merged.
 
 ### Notify text
 
