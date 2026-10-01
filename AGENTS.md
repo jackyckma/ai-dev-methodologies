@@ -14,7 +14,7 @@
 ## Learned Workspace Facts
 
 - Repo `jackyckma/ai-dev-methodologies` is a portable AI dev methodology bundle copied into target projects via `scripts/bootstrap-project.sh` (not a submodule).
-- `main` is at v1.1.0; remote branch `fable5/framework-upgrade-20260710` carries a v1.2.0 agent-first maturity upgrade pending merge to main.
+- `main` is at v1.9.0. File classification lives in `framework-manifest.json`; project updates use `scripts/framework-sync.mjs`. Git tags exist for v1.2.0 and v1.3.0.
 - Framework versioning uses `VERSION`, `CHANGELOG.md`, `instructions/framework-adoption.md`, and per-project `.agents/METHODOLOGY.lock`.
 - Manual sync replaces framework-owned files only; never `--force` bootstrap on active projects (preserves `project-guidelines.md` and live docs).
 - `templates/AGENTS.md` is the bootstrap template for target projects; workspace root `AGENTS.md` is Cursor learned memory for this repo.

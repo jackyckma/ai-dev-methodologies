@@ -129,7 +129,7 @@ A Tier E practice is active **only** if listed in the project's `project-guideli
 
 | Field | Value |
 |-------|-------|
-| Bundle version | 1.5.0 |
+| Bundle version | 1.9.0 |
 | Created | 2026-06-15 |
 | Source | Practices from OrbitaDev + Powerhouse, generalized |
 
