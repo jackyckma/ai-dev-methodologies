@@ -1,15 +1,21 @@
 #!/usr/bin/env node
 // Sync a project checkout to this framework repo.
 //
-//   node scripts/framework-sync.mjs --project <path> [--apply] [--json] [--check] [--allow-dirty]
+//   node scripts/framework-sync.mjs --project <path> [--apply] [--relock] [--json] [--check] [--allow-dirty]
 //
 // Default is dry-run: nothing is written. --apply copies missing overwrite-class
 // files and replaces overwrite/merge files that still match a known baseline.
 // Modified files are never overwritten; a unified diff is written to
 // <project>/.framework-sync/<dest>.patch for hand merge. There is no 3-way merge.
+// --apply also lists .framework-sync/ in the project's .git/info/exclude.
+//
+// --relock rewrites only .agents/METHODOLOGY.lock from the files currently in
+// the project. It is allowed on a dirty tree. It does not touch autopilot state.
 //
 // --check writes nothing and exits 0 only when every overwrite/merge file
 // matches both .agents/METHODOLOGY.lock `files` hashes and the current template.
+//
+// --apply, --relock, and --check are mutually exclusive.
 //
 // Tests: node --test scripts/__tests__/
 
@@ -26,9 +32,10 @@ import { emptyLockData, lockToData, serializeLock } from "./lib/lockfile.mjs";
 import { isActionable, isGlobDest, loadManifest } from "./lib/manifest.mjs";
 import { frameworkRoot } from "./lib/root.mjs";
 
-const USAGE = `Usage: node scripts/framework-sync.mjs --project <path> [--apply] [--json] [--check] [--allow-dirty]
+const USAGE = `Usage: node scripts/framework-sync.mjs --project <path> [--apply | --relock | --check] [--json] [--allow-dirty]
 
-Default is dry-run (no writes). See instructions/framework-adoption.md.
+Default is dry-run (no writes). --relock rewrites only the methodology lock.
+See instructions/framework-adoption.md.
 Tests: node --test scripts/__tests__/
 `;
 
@@ -38,10 +45,11 @@ function fail(message) {
 }
 
 function parseArgs(argv) {
-  const args = { apply: false, json: false, check: false, allowDirty: false, project: "" };
+  const args = { apply: false, relock: false, json: false, check: false, allowDirty: false, project: "" };
   for (let i = 2; i < argv.length; i++) {
     const token = argv[i];
     if (token === "--apply") args.apply = true;
+    else if (token === "--relock") args.relock = true;
     else if (token === "--json") args.json = true;
     else if (token === "--check") args.check = true;
     else if (token === "--allow-dirty") args.allowDirty = true;
@@ -53,7 +61,8 @@ function parseArgs(argv) {
     } else fail(`Unknown argument: ${token}\n${USAGE}`);
   }
   if (!args.project) fail(USAGE);
-  if (args.apply && args.check) fail("Pass only one of --check and --apply.\n");
+  const modes = Number(args.apply) + Number(args.check) + Number(args.relock);
+  if (modes > 1) fail("Pass only one of --apply, --check, and --relock.\n");
   return args;
 }
 
@@ -69,6 +78,18 @@ function git(args, cwd) {
   return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
 }
 
+function isFrameworkSyncPath(raw) {
+  let text = raw.trim();
+  if (text.startsWith('"') && text.endsWith('"') && text.length >= 2) text = text.slice(1, -1);
+  text = text.replace(/\\/g, "/");
+  return text === ".framework-sync" || text === ".framework-sync/" || text.startsWith(".framework-sync/");
+}
+
+function isFrameworkSyncPorcelain(line) {
+  if (line.length < 4) return false;
+  return line.slice(3).split(" -> ").every(isFrameworkSyncPath);
+}
+
 function workingTree(project) {
   try {
     git(["rev-parse", "--is-inside-work-tree"], project);
@@ -76,7 +97,35 @@ function workingTree(project) {
     return { isRepo: false, dirty: true, porcelain: "" };
   }
   const porcelain = git(["status", "--porcelain"], project);
-  return { isRepo: true, dirty: porcelain.trim() !== "", porcelain };
+  const relevant = porcelain
+    .split("\n")
+    .filter((line) => line.trim() !== "" && !isFrameworkSyncPorcelain(line));
+  return { isRepo: true, dirty: relevant.length > 0, porcelain: relevant.join("\n") };
+}
+
+/** List .framework-sync/ in .git/info/exclude. Never edits .gitignore. No-op outside a git repo. */
+function ensureFrameworkSyncExcluded(project) {
+  let excludePath;
+  try {
+    const gitPath = git(["rev-parse", "--git-path", "info/exclude"], project).trim();
+    excludePath = path.resolve(project, gitPath);
+  } catch {
+    return;
+  }
+  mkdirSync(path.dirname(excludePath), { recursive: true });
+  let text = "";
+  try {
+    text = readFileSync(excludePath, "utf8");
+  } catch {
+    text = "";
+  }
+  const present = text.split(/\r?\n/).some((line) => {
+    const trimmed = line.trim();
+    return trimmed === ".framework-sync/" || trimmed === ".framework-sync" || trimmed === ".framework-sync/**";
+  });
+  if (present) return;
+  const prefix = text.length === 0 || text.endsWith("\n") ? "" : "\n";
+  writeFileSync(excludePath, `${text}${prefix}.framework-sync/\n`);
 }
 
 function frameworkCommit() {
@@ -202,6 +251,7 @@ function updateLock(project, manifest, commitInfo) {
 
 function applyChanges(project, rows) {
   let writes = 0;
+  let wrotePatch = false;
   for (const row of rows) {
     const replace = row.state === "BEHIND" && (row.class === "overwrite" || row.class === "merge");
     const copy = row.state === "MISSING" && row.class === "overwrite";
@@ -221,10 +271,11 @@ function applyChanges(project, rows) {
       const patchPath = projectFile(project, row.patch);
       const changed = writeFileMode(patchPath, Buffer.from(diff.text, "utf8"), null);
       if (changed) writes++;
+      wrotePatch = true;
       row.action = "manual-merge";
     }
   }
-  return writes;
+  return { writes, wrotePatch };
 }
 
 function main() {
@@ -242,6 +293,37 @@ function main() {
 
   const manifest = loadManifest(frameworkRoot);
   const commitInfo = frameworkCommit();
+
+  if (args.relock) {
+    const warnings = [];
+    const locks = inspectLocks(project);
+    if (!locks.ok) {
+      warnings.push(`WARNING: ${locks.error}. --relock does not touch autopilot state.`);
+    } else if (locks.active) {
+      warnings.push(
+        "WARNING: docs/autopilot/locks.json has an active lease. --relock does not touch autopilot state.",
+      );
+    }
+    for (const warning of warnings) process.stderr.write(warning + "\n");
+    const lockWritten = updateLock(project, manifest, commitInfo);
+    const text = lockWritten
+      ? "relock: wrote .agents/METHODOLOGY.lock\n"
+      : "relock: .agents/METHODOLOGY.lock unchanged\n";
+    const payload = {
+      ok: true,
+      mode: "relock",
+      framework_version: manifest.framework_version,
+      framework_commit: commitInfo.dirty ? `${commitInfo.head} (dirty)` : commitInfo.head,
+      project,
+      warnings,
+      lock_written: lockWritten,
+    };
+    if (args.json) {
+      process.stderr.write(text);
+      process.stdout.write(JSON.stringify(payload, null, 2) + "\n");
+    } else process.stdout.write(text);
+    return;
+  }
 
   if (args.check) {
     const report = checkProject(frameworkRoot, project, manifest);
@@ -293,7 +375,9 @@ function main() {
   let fileWrites = 0;
   let lockWritten = false;
   if (args.apply) {
-    fileWrites = applyChanges(project, rows);
+    const applied = applyChanges(project, rows);
+    fileWrites = applied.writes;
+    if (applied.wrotePatch) ensureFrameworkSyncExcluded(project);
     lockWritten = updateLock(project, manifest, commitInfo);
   }
 

@@ -13,7 +13,7 @@ Measurement, sync tooling, and version hygiene. No methodology wording changes a
 ### Added
 
 - `framework-manifest.json` — source → dest classification (`overwrite`, `merge`, `project`, `ignore`, `templated`). **no action** (stays in this repo; `framework-sync` reads it from a framework checkout).
-- `scripts/framework-sync.mjs` — dry-run by default; `--apply`, `--check`, `--json`, `--allow-dirty`. **no action** to copy the script into a project. Running it is how a project updates.
+- `scripts/framework-sync.mjs` — dry-run by default; `--apply`, `--relock`, `--check`, `--json`, `--allow-dirty`. `--relock` rewrites only `.agents/METHODOLOGY.lock` and is allowed on a dirty tree. `--apply` lists `.framework-sync/` in the project's `.git/info/exclude` when it writes patches (it does not edit `.gitignore`). **no action** to copy the script into a project. Running it is how a project updates.
 - `scripts/gen-baseline.mjs` and `baselines/1.2.0.json`, `baselines/1.3.0.json`, `baselines/1.6.0-aaa5724.json`, `baselines/1.8.0.json` — sha256 of each manifest source at those git refs. **no action**. The 1.9.0 baseline is generated after this release is merged (see the release checklist). Do not tag from the release branch.
 - `scripts/check-version.mjs` — fails if `VERSION` disagrees with the published version markers. **no action** (maintainer tool).
 - `docs/release-checklist.md` — check-version, `node --test scripts/__tests__/`, regenerate baselines after merge, tag after merge. **no action**.
@@ -23,9 +23,9 @@ Measurement, sync tooling, and version hygiene. No methodology wording changes a
 - `VERSION` → 1.9.0. **no action** (not copied into projects).
 - `README.md` version line, root `AGENTS.md` version fact. **no action** (projects use `templates/docs/README.md` and `templates/AGENTS.md`, which this release does not edit).
 - `METHODOLOGIES.md` version table — copied to `.agents/instructions/METHODOLOGIES.md`. **auto: overwrite** when the project file matches a known baseline; **manual merge** when it does not.
-- `instructions/framework-adoption.md` §2–§3 — copied to `.agents/instructions/framework-adoption.md`. The manifest is the authority for file class; §3 is dry-run → empty locks and consider pausing → `--apply` → hand-merge `.framework-sync/*.patch` → commit / PR per the project's own conventions → `--check`. **auto: overwrite** if the project file matches a known baseline; **manual merge** if the project has edited it.
+- `instructions/framework-adoption.md` §2–§3 — copied to `.agents/instructions/framework-adoption.md`. The manifest is the authority for file class; §3 is dry-run → empty locks and consider pausing → `--apply` → hand-merge `.framework-sync/*.patch` → `--relock` → commit / PR per the project's own conventions → `--check`. Delete `.framework-sync/` once the patches are merged. **auto: overwrite** if the project file matches a known baseline; **manual merge** if the project has edited it.
 - `templates/.agents/METHODOLOGY.lock` and the lock written by `scripts/bootstrap-project.sh` now include lock schema v2 scalars (`lock_schema`, `manifest_version`). **no action** on an existing project lock until `framework-sync.mjs --apply`, which rewrites `.agents/METHODOLOGY.lock` in place: keeps `customized_files` and other existing keys, and sets `files` to sha256 of each overwrite/merge file as it then exists. The template is not byte-copied over the project lock.
-- `scripts/bootstrap-project.sh` — `--force` no longer overwrites project-state files (autopilot JSON state, `project-guidelines.md`, `docs/AGENT_ENV.md`, `scripts/agent-verify.sh`, `docs/CURRENT_STATUS.md`, `docs/SESSION_HANDOFF.md`, filled `planner-preferences.md`) unless `--reset-project-state` is also passed. **no action** for projects that do not re-run bootstrap. Updates go through `framework-sync`.
+- `scripts/bootstrap-project.sh` — `--force` no longer overwrites project-state files (autopilot JSON state, an existing `.agents/METHODOLOGY.lock`, `project-guidelines.md`, `docs/AGENT_ENV.md`, `scripts/agent-verify.sh`, `docs/CURRENT_STATUS.md`, `docs/SESSION_HANDOFF.md`, filled `planner-preferences.md`) unless `--reset-project-state` is also passed. A first bootstrap with no lock still writes one. **no action** for projects that do not re-run bootstrap. Updates go through `framework-sync`.
 
 ### Sync behaviour for files this release does not edit
 
@@ -39,7 +39,7 @@ Measurement, sync tooling, and version hygiene. No methodology wording changes a
 
 1. From a checkout of this repo, dry-run `node scripts/framework-sync.mjs --project <project>`.
 2. Confirm `docs/autopilot/locks.json` has no active lease. Consider pausing the autopilot.
-3. `--apply`, review `.framework-sync/*.patch`, hand-merge, run `--apply` again so the lock hash matches merged bytes, then commit and open a PR using that project's own conventions.
+3. `--apply`, review `.framework-sync/*.patch`, hand-merge, run `--relock` so the lock hash matches the merged bytes, then commit and open a PR using that project's own conventions. Delete `.framework-sync/` once the patches are merged.
 4. `node scripts/framework-sync.mjs --project <project> --check`.
 
 ### Notify text

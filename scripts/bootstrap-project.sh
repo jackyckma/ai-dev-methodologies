@@ -24,6 +24,7 @@ PROJECT_STATE_PATHS=(
   "docs/autopilot/pause-state.json"
   "docs/autopilot/project-hooks.json"
   "docs/autopilot/watchdog-state.json"
+  ".agents/METHODOLOGY.lock"
 )
 
 if [[ $# -lt 1 ]]; then
@@ -85,9 +86,15 @@ copy_tree_instructions() {
 
 write_methodology_lock() {
   local lock="$TARGET/.agents/METHODOLOGY.lock"
-  if [[ -f "$lock" && "$FORCE" -ne 1 ]]; then
-    echo "skip (exists): $lock"
-    return 0
+  if [[ -f "$lock" ]] && is_project_state_dest "$lock"; then
+    if [[ "$RESET_PROJECT_STATE" -ne 1 || "$FORCE" -ne 1 ]]; then
+      if [[ "$FORCE" -eq 1 ]]; then
+        echo "skip (project-state; pass --reset-project-state with --force to overwrite): $lock"
+      else
+        echo "skip (exists): $lock"
+      fi
+      return 0
+    fi
   fi
   local version synced_at source_commit
   version="$(cat "$BUNDLE_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]' || echo "unknown")"

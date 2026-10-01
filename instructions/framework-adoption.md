@@ -210,7 +210,13 @@ node scripts/framework-sync.mjs --project /path/to/your-project --apply
 
 Modified files are listed as manual merge required. Each patch is `<project>/.framework-sync/<dest>.patch`. Review it and merge by hand. For `scripts/autopilot/decide-next-action.mjs`, an unmodified file that lacks the 1.5 `no-autopilot-scaffolds` preflight is replaced in step 3; a modified file gets that preflight only via the patch.
 
-When the hand-merge makes a file match the template, run `--apply` once more before committing so the lock's `files` hash matches the merged bytes. That second run does not rewrite a file that already matches the template.
+When the hand-merge makes a file match the template, run `--relock` before committing. A hand-merge leaves the tree dirty; `--relock` is allowed on that tree. It rewrites only `.agents/METHODOLOGY.lock` (the `files` sha256 map, plus `version`, `source_commit`, `synced_at`, `lock_schema`, and `manifest_version`) and keeps `customized_files` and any other existing keys. It does not copy or patch anything else.
+
+```bash
+node scripts/framework-sync.mjs --project /path/to/your-project --relock
+```
+
+Delete `<project>/.framework-sync/` once the patches are merged. `--apply` lists that directory in `.git/info/exclude` so it is not committed by accident; it does not edit `.gitignore`.
 
 ### Step 5 — Commit and open a PR
 
@@ -244,7 +250,7 @@ There is **no** scheduled auto-sync. With a small portfolio (~5–8 projects), t
 
 | Anti-pattern | Why it fails |
 |--------------|--------------|
-| Re-run `bootstrap-project.sh --force` on active project | Overwrites framework-owned files. Project-state files stay unless `--reset-project-state` is also set. Use `framework-sync` to update. |
+| Re-run `bootstrap-project.sh --force` on active project | Overwrites framework-owned files. An existing `.agents/METHODOLOGY.lock` (including `files` hashes and `customized_files`) and other project-state files stay unless `--reset-project-state` is also set. Use `framework-sync` to update. |
 | Edit framework-owned files for project-specific rules | Drift; use `project-guidelines.md` instead |
 | Sync without reading CHANGELOG | Miss breaking migrations or skip new required files |
 | No update to `METHODOLOGY.lock` | Next agent cannot tell which version the project runs |

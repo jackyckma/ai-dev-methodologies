@@ -444,6 +444,8 @@ test("bootstrap --force keeps project-state files unless --reset-project-state",
     const backlog = path.join(dir, "docs/autopilot/backlog.json");
     const guidelines = path.join(dir, ".agents/instructions/project-guidelines.md");
     const karpathy = path.join(dir, ".agents/instructions/karpathy-guidelines.md");
+    const lockPath = path.join(dir, ".agents/METHODOLOGY.lock");
+    writeFileSync(lockPath, `${readFileSync(lockPath, "utf8")}owner: kept-by-project\n`);
     writeFileSync(locks, '{"locks":{"keep":true}}\n');
     writeFileSync(backlog, '{"tasks":["keep"]}\n');
     writeFileSync(guidelines, "sentinel guidelines\n");
@@ -454,6 +456,8 @@ test("bootstrap --force keeps project-state files unless --reset-project-state",
       encoding: "utf8",
     });
     assert.equal(forced.status, 0, forced.stderr);
+    assert.match(forced.stdout, /skip \(project-state.*METHODOLOGY\.lock/);
+    assert.match(readFileSync(lockPath, "utf8"), /owner: kept-by-project/);
     assert.equal(readFileSync(locks, "utf8"), '{"locks":{"keep":true}}\n');
     assert.equal(readFileSync(backlog, "utf8"), '{"tasks":["keep"]}\n');
     assert.equal(readFileSync(guidelines, "utf8"), "sentinel guidelines\n");
@@ -480,7 +484,160 @@ test("bootstrap --force keeps project-state files unless --reset-project-state",
       readFileSync(guidelines, "utf8"),
       readFileSync(path.join(ROOT, "templates/project-guidelines.template.md"), "utf8"),
     );
+    const resetLock = readFileSync(lockPath, "utf8");
+    assert.match(resetLock, /lock_schema: 2/);
+    assert.doesNotMatch(resetLock, /owner: kept-by-project/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+function fileHashes(dir, skip) {
+  const out = {};
+  function walk(rel) {
+    for (const name of readdirSync(path.join(dir, rel))) {
+      if (rel === "" && (name === ".git" || name === ".framework-sync")) continue;
+      const next = rel ? `${rel}/${name}` : name;
+      if (skip.has(next)) continue;
+      const full = path.join(dir, next);
+      if (statSync(full).isDirectory()) walk(next);
+      else out[next] = sha256(readFileSync(full));
+    }
+  }
+  walk("");
+  return out;
+}
+
+test("--relock updates only the lock on a dirty tree and --check passes after hand-merge", () => {
+  const dir = tempDir();
+  try {
+    const manifest = loadManifest(ROOT);
+    const playRel = "docs/autopilot/playbook.md";
+    const playSrc = readFileSync(path.join(ROOT, "templates/docs/autopilot/playbook.md"));
+    for (const entry of manifest.entries) {
+      if (!isActionable(entry) || isGlobDest(entry.dest)) continue;
+      const buf = entry.dest === playRel ? Buffer.concat([playSrc, Buffer.from("PROJECT EDIT SENTINEL\n")]) : readFileSync(path.join(ROOT, entry.source));
+      write(dir, entry.dest, buf);
+    }
+    const lockText = V1_LOCK.replace(
+      "  - scripts/agent-verify.sh\n",
+      "  - scripts/agent-verify.sh\n  - docs/LOCAL.md\n",
+    );
+    write(dir, ".agents/METHODOLOGY.lock", lockText);
+    write(dir, "docs/autopilot/pause-state.json", '{"paused":true}\n');
+    write(dir, ".gitignore", "node_modules\n");
+    initRepo(dir);
+
+    const applied = node(["scripts/framework-sync.mjs", "--project", dir, "--apply", "--json"]);
+    assert.equal(applied.status, 0, applied.stderr);
+    const excludePath = path.join(dir, ".git/info/exclude");
+    assert.match(readFileSync(excludePath, "utf8"), /^\.framework-sync\/$/m);
+    assert.equal(readFileSync(path.join(dir, ".gitignore"), "utf8"), "node_modules\n");
+
+    const excludeBefore = readFileSync(excludePath, "utf8").replace(/^\.framework-sync\/\n/m, "");
+    writeFileSync(excludePath, excludeBefore);
+    const again = node(["scripts/framework-sync.mjs", "--project", dir, "--apply", "--allow-dirty"]);
+    assert.equal(again.status, 0, again.stderr);
+    const excludeLines = readFileSync(excludePath, "utf8").split("\n").filter((line) => line.trim() === ".framework-sync/");
+    assert.equal(excludeLines.length, 1);
+    assert.equal(readFileSync(path.join(dir, ".gitignore"), "utf8"), "node_modules\n");
+
+    write(dir, playRel, playSrc);
+    const refused = node(["scripts/framework-sync.mjs", "--project", dir, "--apply"]);
+    assert.notEqual(refused.status, 0);
+    assert.match(refused.stderr, /not clean/);
+
+    const before = fileHashes(dir, new Set([".agents/METHODOLOGY.lock"]));
+    const relock = node(["scripts/framework-sync.mjs", "--project", dir, "--relock", "--json"]);
+    assert.equal(relock.status, 0, relock.stderr);
+    const relockBody = JSON.parse(relock.stdout);
+    assert.equal(relockBody.mode, "relock");
+    assert.equal(relockBody.lock_written, true);
+    assert.deepEqual(fileHashes(dir, new Set([".agents/METHODOLOGY.lock"])), before);
+    const lock = lockToData(readFileSync(path.join(dir, ".agents/METHODOLOGY.lock"), "utf8"));
+    assert.equal(lock.maps.files[playRel], sha256(playSrc));
+    assert.equal(lock.scalars.owner, "jane");
+    assert.ok(lock.lists.customized_files.includes("docs/LOCAL.md"));
+
+    const lockBytes = readFileSync(path.join(dir, ".agents/METHODOLOGY.lock"));
+    const second = node(["scripts/framework-sync.mjs", "--project", dir, "--relock", "--json"]);
+    assert.equal(second.status, 0, second.stderr);
+    assert.equal(JSON.parse(second.stdout).lock_written, false);
+    assert.deepEqual(readFileSync(path.join(dir, ".agents/METHODOLOGY.lock")), lockBytes);
+    assert.match(second.stderr, /unchanged/);
+
+    const checked = node(["scripts/framework-sync.mjs", "--project", dir, "--check"]);
+    assert.equal(checked.status, 0, checked.stderr);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("--relock refuses the framework repo and a missing path, warns on an active lease, and does not combine with --apply", () => {
+  const missingParent = tempDir();
+  try {
+    const missing = node(["scripts/framework-sync.mjs", "--project", path.join(missingParent, "no-such-dir"), "--relock"]);
+    assert.notEqual(missing.status, 0);
+    assert.match(missing.stderr, /does not exist/);
+  } finally {
+    rmSync(missingParent, { recursive: true, force: true });
+  }
+
+  const self = node(["scripts/framework-sync.mjs", "--project", ROOT, "--relock"]);
+  assert.notEqual(self.status, 0);
+  assert.match(self.stderr, /framework repo itself/);
+
+  const both = node(["scripts/framework-sync.mjs", "--project", ROOT, "--relock", "--apply"]);
+  assert.notEqual(both.status, 0);
+  assert.match(both.stderr, /only one of/);
+
+  const dir = tempDir();
+  try {
+    const lease = '{"locks":{"T-1":{"since":"2026-10-01T00:00:00Z","pr":1}}}\n';
+    write(dir, "docs/autopilot/locks.json", lease);
+    write(dir, "README.md", "x\n");
+    initRepo(dir);
+    const relock = node(["scripts/framework-sync.mjs", "--project", dir, "--relock"]);
+    assert.equal(relock.status, 0, relock.stderr);
+    assert.match(relock.stderr, /WARNING:.*active lease/);
+    assert.equal(readFileSync(path.join(dir, "docs/autopilot/locks.json"), "utf8"), lease);
+    assert.equal(existsSync(path.join(dir, ".framework-sync")), false);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test(".framework-sync dirt is ignored, and a non-git project does not grow a .git", () => {
+  const dir = tempDir();
+  try {
+    write(dir, "README.md", "x\n");
+    initRepo(dir);
+    write(dir, ".framework-sync/leftover.patch", "not a real change\n");
+    write(dir, "DIRTY.txt", "real dirt\n");
+    const refused = node(["scripts/framework-sync.mjs", "--project", dir, "--apply"]);
+    assert.notEqual(refused.status, 0);
+    assert.match(refused.stderr, /not clean/);
+    assert.match(refused.stderr, /DIRTY\.txt/);
+    assert.doesNotMatch(refused.stderr, /\.framework-sync/);
+
+    rmSync(path.join(dir, "DIRTY.txt"));
+    const applied = node(["scripts/framework-sync.mjs", "--project", dir, "--apply"]);
+    assert.equal(applied.status, 0, applied.stderr);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+
+  const bare = tempDir();
+  try {
+    const playRel = "docs/autopilot/playbook.md";
+    const playSrc = readFileSync(path.join(ROOT, "templates/docs/autopilot/playbook.md"));
+    write(bare, playRel, Buffer.concat([playSrc, Buffer.from("LOCAL\n")]));
+    write(bare, "docs/autopilot/pause-state.json", '{"paused":true}\n');
+    const applied = node(["scripts/framework-sync.mjs", "--project", bare, "--apply", "--allow-dirty"]);
+    assert.equal(applied.status, 0, applied.stderr);
+    assert.equal(existsSync(path.join(bare, ".git")), false);
+    assert.equal(existsSync(path.join(bare, ".framework-sync", `${playRel}.patch`)), true);
+  } finally {
+    rmSync(bare, { recursive: true, force: true });
   }
 });
