@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "framework_version": "1.9.0",
+  "framework_version": "1.10.0",
   "entries": [
     {
       "source": "templates/.agents/README.md",
@@ -320,6 +320,18 @@
       "source": "templates/scripts/autopilot/apply-decision-defaults.mjs",
       "dest": "scripts/autopilot/apply-decision-defaults.mjs",
       "class": "overwrite"
+    },
+    {
+      "source": "templates/scripts/autopilot/check-active-writer.mjs",
+      "dest": "scripts/autopilot/check-active-writer.mjs",
+      "class": "overwrite",
+      "note": "Read-only lease/pause check for human and hub sessions. Missing file is copied. A modified project copy is not overwritten; sync writes a patch."
+    },
+    {
+      "source": "templates/scripts/autopilot/completion-status.mjs",
+      "dest": "scripts/autopilot/completion-status.mjs",
+      "class": "overwrite",
+      "note": "Pure helper imported by the report scripts. No CLI. Same overwrite rule as the other autopilot helpers."
     },
     {
       "source": "templates/scripts/autopilot/decide-next-action.mjs",

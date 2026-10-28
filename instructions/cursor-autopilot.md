@@ -121,6 +121,18 @@ scaffolds + playbook/automations/README** as framework-owned; treat
    compliance tasks.
 7. **PR titles include `T-xxxx`** — Checker matches leases and closes
    duplicates.
+8. **Completion status** — when reporting a task, record `done`,
+   `done_with_concerns`, `needs_context`, or `blocked` per
+   `docs/autopilot/playbook.md`. `done` requires the acceptance output
+   from this run. `needs_context` is the existing `needs_human` path
+   (and `decisions.json` when a decision is missing). Recording the
+   status does not change green-only merge.
+9. **One writer** — only one actor writes source (anything outside
+   `docs/autopilot/`) at a time. A human or hub session runs
+   `node scripts/autopilot/check-active-writer.mjs` first. Exit 1 with
+   a live lease: control files only. Exit 2 (`cannot determine`) is not
+   "no lease". Lease `pr` is `null` or a JSON integer, never a URL.
+   Parallel experiments use another worktree or branch.
 
 ---
 

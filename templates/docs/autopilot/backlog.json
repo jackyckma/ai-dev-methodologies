@@ -11,7 +11,15 @@
       "flag": "FEATURE_FLAG_NAME or null",
       "status": "ready | in_progress | in_review | blocked | done | needs_human",
       "retries": 0,
-      "feedback": []
+      "feedback": [],
+      "completion": {
+        "_optional": true,
+        "status": "done | done_with_concerns | needs_context | blocked",
+        "concern": "one or two sentences when status is done_with_concerns; the human gap for needs_context; what was tried for blocked",
+        "evidence": "required for done: acceptance output from this run, or exit codes plus the tail. Empty evidence is not done.",
+        "by": "maker | checker",
+        "at": "ISO-8601"
+      }
     },
     "defaults": {
       "retry_budget": 2,

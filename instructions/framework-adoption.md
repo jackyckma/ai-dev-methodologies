@@ -93,6 +93,8 @@ docs/autopilot/README.md
 docs/autopilot/report.example.json
 docs/autopilot/report.schema.json
 scripts/autopilot/apply-decision-defaults.mjs
+scripts/autopilot/check-active-writer.mjs
+scripts/autopilot/completion-status.mjs
 scripts/autopilot/deploy-watchdog.mjs
 scripts/autopilot/dispatch-core.mjs
 scripts/autopilot/queue-status.mjs

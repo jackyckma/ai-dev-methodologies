@@ -57,6 +57,12 @@ Everything is **pull**. A project never needs an outbound hub client, hub creden
 
 Instruction dispatch (the return path) is **not** covered here — it goes through `docs/autopilot/backlog.json`, gated by founder discussion. A report is read-only output.
 
+### Single active writer
+
+A hub session that writes into a project repo is another actor on that tree. Before it edits anything outside `docs/autopilot/`, run `node scripts/autopilot/check-active-writer.mjs` in that repo.
+
+Exit 0 means no live lease and the loop is not paused. Exit 1 means a live lease and/or a pause: do not edit source. `decisions.json`, `roadmap.json`, and backlog fields the hub owns are the control files it may still edit. Exit 2 means the lease or pause file could not be read (`cannot determine`). That is not permission to write. Lease `pr` is an integer or `null`, never a URL. A second experiment belongs in another worktree or branch, not the same working directory. The canonical steps are in the project's `docs/autopilot/playbook.md`.
+
 ---
 
 ## 3. What a project actually has to do
@@ -133,8 +139,9 @@ Rules:
 | `source_sha` | Git commit described. Include wherever the line can know it — see §1. |
 | `generated_at` | ISO-8601 UTC. |
 | `period` | `{since, until}`; `since` inclusive, `until` exclusive. |
-| `status` | Health of **report generation**, not of the product. Product problems belong in `risks`. |
+| `status` | Health of **report generation**, not of the product. Product problems belong in `risks`. Not a task completion status. |
 | `sections[]` | Exactly six, §4 order. `body` is Markdown. |
+| `completions[]` | Optional. Omit it when the period recorded none. Each item is `{task_id, status, concern, evidence}` with `status` of `done`, `done_with_concerns`, `needs_context`, or `blocked`. `done` requires non-empty `evidence` (the acceptance output from that run, or exit codes plus the tail). `done_with_concerns` requires `concern` (one or two sentences). `needs_context` is the existing `needs_human` / `decisions.json` gap. Do not copy backlog-only keys (`by`, `at`) into this array. |
 
 Machine-checkable: [`report.schema.json`](../templates/docs/autopilot/report.schema.json). Example: [`report.example.json`](../templates/docs/autopilot/report.example.json).
 
@@ -169,6 +176,8 @@ It **will** change. It changes **here**, once, for everyone — never in a produ
 
 `edge` (1.1) and the `deploy` value (1.2) are both worked examples of the **additive** path: optional, defaulted, nothing had to migrate on the day.
 
+`completions[]` (bundle 1.10.0) is the same kind of addition. `schema_version` stays **1.2**. Old payloads remain valid if they omit the array, and a 1.0 or 1.1 document may include it. A schema_version bump was not required for that; whether to bump later is a founder decision.
+
 **Breaking change process:** propose in the framework repo, stating why the additive route was rejected — it is almost always available and almost always better. Bump `schema_version` here *and* in the schema. **The hub accepts both versions for the whole migration window** — this rule is load-bearing: several projects will never migrate on the same day, and a hub that accepts only the newest version blinds the founder to every project that has not caught up. Migrate one project at a time as ordinary backlog tasks. Retire the old version only after reading each project's latest report to confirm — not by assuming.
 
 **Who decides:** the founder, at the framework repo. An agent that finds the contract wrong says so in a PR or a `needs_founder` line. It does **not** patch its local copy — a project that edits its own `report.schema.json` has silently left the portfolio while still appearing in it.
@@ -193,4 +202,4 @@ It **will** change. It changes **here**, once, for everyone — never in a produ
 
 ## 9. Version
 
-Contract `schema_version` **1.2** (bundle 1.6.0). 1.0 and 1.1 remain valid. See [CHANGELOG.md](../CHANGELOG.md). Hub-side design: `jackyckma/orbita docs/personal-steward/portfolio-hub.md` and `portfolio-collectors.md`. If a hub doc and this file disagree on the wire format, **this file wins** — the hub is one consumer, the contract is shared.
+Contract `schema_version` **1.2** (bundle 1.6.0; optional `completions[]` added in bundle 1.10.0 without a schema_version bump). 1.0 and 1.1 remain valid, with or without `completions[]`. See [CHANGELOG.md](../CHANGELOG.md). Hub-side design: `jackyckma/orbita docs/personal-steward/portfolio-hub.md` and `portfolio-collectors.md`. If a hub doc and this file disagree on the wire format, **this file wins** — the hub is one consumer, the contract is shared.

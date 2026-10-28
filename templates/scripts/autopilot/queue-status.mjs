@@ -4,13 +4,26 @@
 // Prints a small report + a REFILL_NEEDED flag when the ready queue is running low,
 // so the Planner knows whether to decompose the next epic into fresh tasks.
 //
-// Threshold via env READY_MIN (default 2). Exit code always 0.
+// Threshold via env READY_MIN (default 2). Exit code is 0, except a `--root`
+// flag with no path (exit 1). Optional `--root <dir>` is for tests.
 
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { completionLines } from "./completion-status.mjs";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+function repoRoot() {
+  const flag = process.argv.indexOf("--root");
+  if (flag < 0) return path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+  const value = process.argv[flag + 1];
+  if (!value) {
+    process.stderr.write("Usage: node scripts/autopilot/queue-status.mjs [--root <dir>]\n");
+    process.exit(1);
+  }
+  return path.resolve(value);
+}
+
+const root = repoRoot();
 const READY_MIN = Number.parseInt(process.env.READY_MIN ?? "2", 10);
 
 const backlog = JSON.parse(await readFile(path.join(root, "docs", "autopilot", "backlog.json"), "utf8"));
@@ -38,6 +51,7 @@ const recentFeedback = tasks
   .slice(-12);
 
 const refillNeeded = actionableReady.length < READY_MIN;
+const completions = completionLines(tasks);
 
 const out = [
   `READY_MIN=${READY_MIN}`,
@@ -47,6 +61,8 @@ const out = [
   `REFILL_NEEDED=${refillNeeded}`,
   "recent_feedback:",
   ...recentFeedback.map((f) => `  - ${f}`),
+  "completions:",
+  ...(completions.length ? completions.map((line) => `  ${line}`) : ["  (none)"]),
 ].join("\n");
 
 process.stdout.write(out + "\n");

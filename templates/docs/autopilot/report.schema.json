@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/jackyckma/ai-dev-methodologies/blob/main/templates/docs/autopilot/report.schema.json",
   "title": "Portfolio hub project report",
-  "description": "Shared report contract. Spec: .agents/instructions/portfolio-hub-reporting.md. Framework-owned — a project must NOT edit this file; doing so silently removes it from the portfolio. Accepts schema_version 1.0, 1.1 and 1.2.",
+  "description": "Shared report contract. Spec: .agents/instructions/portfolio-hub-reporting.md. Framework-owned — a project must NOT edit this file; doing so silently removes it from the portfolio. Accepts schema_version 1.0, 1.1 and 1.2. Optional completions[] may appear on any of those versions; omitting it is valid. schema_version was not bumped for that field.",
   "type": "object",
   "required": ["schema_version", "project", "generated_at", "period", "status", "sections"],
   "additionalProperties": false,
@@ -41,7 +41,52 @@
     },
     "status": {
       "enum": ["ok", "degraded", "failed"],
-      "description": "Health of report GENERATION, not of the product. Product problems belong in the risks section."
+      "description": "Health of report GENERATION, not of the product. Product problems belong in the risks section. Not the task completion status."
+    },
+    "completions": {
+      "type": "array",
+      "description": "Optional. Per-task completion reports from this period. Absent on older reports. Not the report-level status field. A done item without evidence is invalid; consumers must not treat that item as done.",
+      "items": {
+        "type": "object",
+        "required": ["task_id", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "task_id": { "type": "string", "minLength": 1 },
+          "status": {
+            "enum": ["done", "done_with_concerns", "needs_context", "blocked"]
+          },
+          "concern": {
+            "type": "string",
+            "description": "Required when status is done_with_concerns: one or two sentences. Also used for the needs_context gap and for what blocked tried."
+          },
+          "evidence": {
+            "type": "string",
+            "description": "Actual acceptance output from this run, or exit codes plus the tail. Required when status is done."
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": { "status": { "const": "done" } },
+              "required": ["status"]
+            },
+            "then": {
+              "required": ["evidence"],
+              "properties": { "evidence": { "minLength": 1 } }
+            }
+          },
+          {
+            "if": {
+              "properties": { "status": { "const": "done_with_concerns" } },
+              "required": ["status"]
+            },
+            "then": {
+              "required": ["concern"],
+              "properties": { "concern": { "minLength": 1 } }
+            }
+          }
+        ]
+      }
     },
     "sections": {
       "type": "array",

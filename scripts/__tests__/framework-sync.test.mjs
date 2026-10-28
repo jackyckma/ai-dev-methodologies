@@ -342,9 +342,9 @@ test("classification, apply, patches, v1 lock, and a second apply", () => {
     }
 
     const lock = lockToData(readFileSync(path.join(dir, ".agents/METHODOLOGY.lock"), "utf8"));
-    assert.equal(lock.scalars.version, "1.9.0");
+    assert.equal(lock.scalars.version, "1.10.0");
     assert.equal(lock.scalars.lock_schema, "2");
-    assert.equal(lock.scalars.manifest_version, "1.9.0");
+    assert.equal(lock.scalars.manifest_version, "1.10.0");
     assert.equal(lock.scalars.synced_by, "bootstrap");
     assert.equal(lock.scalars.owner, "jane");
     assert.match(lock.scalars.notes, /^Initial bootstrap/);

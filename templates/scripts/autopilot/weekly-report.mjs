@@ -5,8 +5,20 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { completionLines } from "./completion-status.mjs";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+function repoRoot() {
+  const flag = process.argv.indexOf("--root");
+  if (flag < 0) return path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+  const value = process.argv[flag + 1];
+  if (!value) {
+    process.stderr.write("Usage: node scripts/autopilot/weekly-report.mjs [--root <dir>]\n");
+    process.exit(1);
+  }
+  return path.resolve(value);
+}
+
+const root = repoRoot();
 const today = new Date().toISOString().slice(0, 10);
 
 const roadmap = JSON.parse(await readFile(path.join(root, "docs", "autopilot", "roadmap.json"), "utf8"));
@@ -25,6 +37,9 @@ const out = `# Autopilot weekly — ${today}
 
 ## Epics vs delivery
 ${lines.join("\n") || "- (no epics)"}
+
+## Completion
+${completionLines(tasks).map((line) => `- ${line}`).join("\n") || "- (none)"}
 
 ## Direction check
 - Are \`approved\` epics still the right focus?

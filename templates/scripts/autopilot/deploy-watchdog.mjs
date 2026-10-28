@@ -15,8 +15,20 @@ import { readFile, writeFile } from "node:fs/promises";
 import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { completionLines } from "./completion-status.mjs";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+function repoRoot() {
+  const flag = process.argv.indexOf("--root");
+  if (flag < 0) return path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+  const value = process.argv[flag + 1];
+  if (!value) {
+    process.stderr.write("Usage: node scripts/autopilot/deploy-watchdog.mjs [--root <dir>]\n");
+    process.exit(1);
+  }
+  return path.resolve(value);
+}
+
+const root = repoRoot();
 const ap = (p) => path.join(root, "docs", "autopilot", p);
 
 async function loadJson(p, fallback) {
@@ -60,6 +72,17 @@ if (smokeCmd) {
 
 const watchPath = ap("watchdog-state.json");
 const pausePath = ap("pause-state.json");
+
+try {
+  const backlog = JSON.parse(await readFile(ap("backlog.json"), "utf8"));
+  const lines = completionLines(backlog.tasks ?? []);
+  if (lines.length) {
+    console.log("completions:");
+    for (const line of lines) console.log(`  ${line}`);
+  }
+} catch {
+  // Surfacing is best-effort. A missing backlog must not change PASS/FAIL.
+}
 
 if (ok) {
   await writeFile(

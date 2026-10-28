@@ -1,4 +1,4 @@
 {
-  "_doc": "Task lease lock on main. Maker writes lock + in_progress on main BEFORE branching. Checker clears on merge or bounce.",
+  "_doc": "Task lease lock on main. Maker writes lock + in_progress on main BEFORE branching. Checker clears on merge or bounce. pr is null or a JSON integer, never a URL or a numeric string. A lease stays live until this entry is removed; age does not expire it.",
   "locks": {}
 }
