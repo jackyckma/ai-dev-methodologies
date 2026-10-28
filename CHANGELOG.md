@@ -6,6 +6,62 @@ Format based on [Keep a Changelog](https://keepachangelog.com/). Version follows
 
 **Maintainers:** see [CHANGELOG-GUIDE.md](CHANGELOG-GUIDE.md) for release checklist and entry template. From 1.9.0, also see [docs/release-checklist.md](docs/release-checklist.md).
 
+## [1.10.0] - 2026-10-28
+
+Two additive Autopilot rules. Unsynced project repos keep working unchanged. New fields are optional. Dispatcher decisions are unchanged: `decide-next-action.mjs` and `dispatch-core.mjs` are not edited, and Checker still merges a green `verify-all` when the completion status is `done_with_concerns`. There is no `schema_version` bump. Project impact uses the 1.9.0 labels: **auto: overwrite**, **manual merge**, **no action**.
+
+### Added
+
+- `templates/scripts/autopilot/check-active-writer.mjs` — read-only. Prints whether a live lease or a pause exists. Exit 0 clear, exit 1 live lease and/or pause, exit 2 `cannot determine`. A lease `pr` that is not `null` or a JSON integer (a URL, a numeric string, a non-integer) is exit 2, never "no lease". Does not write. **auto: overwrite** when the project file is missing or matches a known baseline; **manual merge** when the project has its own copy that differs.
+- `templates/scripts/autopilot/completion-status.mjs` — pure helper the report scripts import. `done` with empty `evidence` is surfaced as refused, not as `done`. **auto: overwrite** / **manual merge**, same rule as the other autopilot helpers.
+- `scripts/__tests__/check-active-writer.test.mjs` — maintainer test. **no action** (not copied).
+- `scripts/__tests__/framework-sync.test.mjs` — the apply-lock assertion follows `framework_version` (now 1.10.0). **no action**.
+
+### Changed
+
+- `templates/docs/autopilot/playbook.md` — completion statuses `done` | `done_with_concerns` | `needs_context` | `blocked`, the evidence rule, where to record them (backlog `feedback` + optional `completion`, PR description, Checker comment), and the single-active-writer rule. Lease `pr` is documented as `null` or a JSON integer. Merge steps are unchanged. **auto: overwrite** when the project file matches a known baseline; **manual merge** when it does not (class `merge`).
+- `instructions/cursor-autopilot.md` — hard rules 8 and 9 point at those playbook sections. **auto: overwrite** / **manual merge** (class `overwrite`; a modified copy gets a patch).
+- `instructions/session-handoff.md` — human sessions on an Autopilot repo run the helper before writing source. **auto: overwrite** / **manual merge**.
+- `instructions/autonomous-loop.md` — same check as a precondition; loop-log `Outcome` may use the four statuses. **auto: overwrite** / **manual merge**.
+- `instructions/portfolio-hub-reporting.md` — hub sessions run the helper before writing source; optional report field `completions[]`. **auto: overwrite** / **manual merge**.
+- `instructions/framework-adoption.md` — §2 overwrite list names the two new scripts. **auto: overwrite** / **manual merge**.
+- `templates/docs/autopilot/report.schema.json` — optional `completions[]`. `schema_version` stays `"1.2"` (still accepts 1.0 and 1.1). A `done` item without `evidence`, and a `done_with_concerns` item without `concern`, fails the item schema. Old reports that omit the array stay valid. **auto: overwrite** / **manual merge**. Not a schema_version bump: the field is optional, so a bump was not required. §7 of the hub contract would otherwise call an additive field a minor schema bump; that bump is left for a founder decision.
+- `templates/docs/autopilot/report.example.json` — one `completions` item with evidence. **auto: overwrite** / **manual merge**.
+- `templates/docs/autopilot/README.md` — points at the completion status and the helper. **auto: overwrite** / **manual merge**.
+- `templates/scripts/autopilot/render-report.mjs`, `weekly-report.mjs`, `queue-status.mjs`, `deploy-watchdog.mjs` — print the status and concern. `render-report.mjs` also prints stored evidence, and prints a claimed `done` with no evidence as refused. Watchdog PASS/FAIL and the pause write are unchanged. Optional `--root` is for tests. **auto: overwrite** / **manual merge**.
+- `templates/docs/autopilot/backlog.json` — `_schema` documents optional `completion`. The example task is unchanged. **no action** (class `project`; sync does not write it). New bootstraps see the note.
+- `templates/docs/autopilot/locks.json` — `_doc` says `pr` is null or an integer and that age does not expire a lease. **no action** (class `ignore`).
+- `templates/docs/autopilot/reports/README.md` — daily report mentions the Completion section. **no action** (class `ignore`).
+- `VERSION` → 1.10.0. **no action**.
+- `README.md` version line and root `AGENTS.md` version fact. **no action** (projects do not copy these files).
+- `METHODOLOGIES.md` version table. **auto: overwrite** / **manual merge**.
+- `framework-manifest.json` — `framework_version` 1.10.0 and overwrite entries for the two new scripts. **no action** (stays in this repo; `framework-sync` reads it from a framework checkout).
+
+### Not changed
+
+- `templates/scripts/autopilot/decide-next-action.mjs` and `dispatch-core.mjs`. `parsePrNumber` still accepts a legacy URL or numeric string so an old lease cannot trip `CLOSE_STALE`. The new helper does not treat that shape as "no lease"; it exits 2.
+- Task `status` values, retry / `needs_human` transitions, and green-only merge.
+
+### Migration
+
+No backlog rewrite. Tasks without `completion` stay valid. Hub reports without `completions` stay valid.
+
+1. From a checkout of this repo, dry-run `node scripts/framework-sync.mjs --project <project>`.
+2. Confirm `docs/autopilot/locks.json` has no active lease. Consider pausing the autopilot.
+3. `--apply`, review `.framework-sync/*.patch`, hand-merge. Re-lock and `--check` per `framework-adoption.md` §3.
+
+After this release is merged to `main` (do not tag from the release branch, and do not invent a baseline on the branch), regenerate the content baseline on the merge commit:
+
+```bash
+node scripts/gen-baseline.mjs HEAD 1.10.0
+```
+
+Then tag `v1.10.0` on that commit. `gen-baseline.mjs` hashes the git blob at the commit; a dirty worktree is not included.
+
+### Notify text
+
+> Methodology updated to **v1.10.0**. Two optional Autopilot additions: a completion status on task reports (`done` requires this run's acceptance output; `done_with_concerns` is recorded and does not block merge), and a read-only `check-active-writer.mjs` so a human or hub session can see a live lease before it edits source. Unsynced repos are unchanged. Dry-run `node scripts/framework-sync.mjs --project <repo>`. The dispatcher is not in this release.
+
 ## [1.9.0] - 2026-10-01
 
 Measurement, sync tooling, and version hygiene. No methodology wording changes and no change to the behaviour of `scripts/autopilot/*.mjs` or `docs/autopilot/playbook.md`. There is no automatic 3-way merge. Project impact uses three labels: **auto: overwrite** (a missing overwrite-class file is copied, or an unmodified baseline copy is replaced), **manual merge** (the project file is left in place and a patch is written under `.framework-sync/`), **no action** (the file is not applied to project repos, or sync will not touch it).

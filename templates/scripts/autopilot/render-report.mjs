@@ -6,8 +6,20 @@ import { readFile } from "node:fs/promises";
 import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { formatCompletionMarkdown } from "./completion-status.mjs";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+function repoRoot() {
+  const flag = process.argv.indexOf("--root");
+  if (flag < 0) return path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+  const value = process.argv[flag + 1];
+  if (!value) {
+    process.stderr.write("Usage: node scripts/autopilot/render-report.mjs [--root <dir>]\n");
+    process.exit(1);
+  }
+  return path.resolve(value);
+}
+
+const root = repoRoot();
 const today = new Date().toISOString().slice(0, 10);
 
 function sh(cmd) {
@@ -52,6 +64,9 @@ ${byStatus("ready")
 
 ## Needs human
 ${byStatus("needs_human").map(line).join("\n") || "- (none)"}
+
+## Completion
+${formatCompletionMarkdown(tasks) || "- (none)"}
 
 ## Decisions awaiting you (sorted by leverage)
 ${openDec.map((d) => `- ${d.id} — ${d.title} — unblocks ${(d.unblocks ?? []).length} — recommended: ${d.recommendation ?? "?"}`).join("\n") || "- (none)"}

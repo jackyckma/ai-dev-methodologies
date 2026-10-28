@@ -44,5 +44,12 @@
       "title": "Ask",
       "body": "Decide D-002 (job post pricing). Everything else can proceed without you."
     }
+  ],
+  "completions": [
+    {
+      "task_id": "T-0002",
+      "status": "done",
+      "evidence": "exit 0\nagent-verify: ok\n(tail) 14 passed"
+    }
   ]
 }

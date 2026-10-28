@@ -27,6 +27,12 @@ Depends on: `issue-quality.md` (agent-ready issues), `judgment-rubrics.md`
 - [ ] A **budget** is set. If the founder gave none, default:
       **3 completed issues or the first Tier-3 decision, whichever comes
       first** — then stop and report.
+- [ ] If the repo has `docs/autopilot/`, run
+      `node scripts/autopilot/check-active-writer.mjs` before the first
+      source edit. Exit 1 or 2: do not write source in this working
+      directory (a live lease allows only autopilot control files). Exit 2
+      means the lease could not be read, not that the tree is free.
+      Another experiment uses another worktree or branch.
 
 If a precondition fails, fix that first (e.g. propose AC for one issue and
 queue it for confirmation) — do not start looping.
@@ -65,6 +71,12 @@ predates it):
 
 Write it **after every iteration**, not at the end. If the session dies
 mid-loop, the log plus the last commit is the whole handoff.
+
+On an Autopilot repo, `Outcome` uses the completion status (`done`,
+`done_with_concerns`, `needs_context`, `blocked`). `done` is only allowed
+when this row, or the task report it points at, includes the acceptance
+output from this run. `needs_context` is the existing human ask (a pending
+decision in the handoff, and `decisions.json` when that file exists).
 
 ## 4. Stop conditions — exit, write handoff, report
 

@@ -12,6 +12,11 @@
 Every task is judged **pass/fail by a command**, not by opinion. If success can
 only be judged by a human, mark the task `needs_human`.
 
+When Maker or Checker reports a task, they also record a completion status:
+`done`, `done_with_concerns`, `needs_context`, or `blocked`. `done` requires
+the acceptance output from that run. The status is recorded and shown. It
+does not change the merge rule. See `playbook.md`.
+
 ## Two lanes
 
 | Lane | Does | Never |
@@ -30,6 +35,9 @@ Dispatcher: `node scripts/autopilot/decide-next-action.mjs --lane maker|checker`
 - New user-facing features behind flags (default off); automations do not flip prod flags.
 - Roadmap-bounded: only decompose `approved` epics.
 - Verification not by author (Checker ≠ Maker).
+- One writer of source at a time. Before a human or hub session edits
+  anything outside this directory, run `node scripts/autopilot/check-active-writer.mjs`.
+  A live lease blocks source edits. Exit 2 means the lease could not be read.
 
 ## Setup checklist
 

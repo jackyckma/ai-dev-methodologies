@@ -34,6 +34,20 @@ Do **not** treat handoff as a substitute for roadmap or architecture docs.
 2. Then `docs/AGENT_ENV.md` (if present), roadmap/progress docs, and domain docs as needed.
 3. Update or clear stale sections as you make progress.
 
+## Autopilot repos — one writer
+
+If `docs/autopilot/` is present, this session is not the only actor that may write the tree. Before editing any path outside `docs/autopilot/`, run:
+
+```bash
+node scripts/autopilot/check-active-writer.mjs
+```
+
+- Exit 0 — no live lease, and the loop is not paused.
+- Exit 1 — a live lease and/or a pause. Do not edit source. A live lease allows control files only: `docs/autopilot/decisions.json`, `roadmap.json`, and backlog fields this session owns. Do not clear `locks.json` to seize the tree.
+- Exit 2 — `cannot determine`. The lease or pause file could not be read. That is not "no lease". Do not edit source.
+
+A lease `pr` is a JSON integer or `null`, never a URL. A lease stays live until its entry is removed; age does not expire it. Parallel work uses a separate git worktree or branch, not this working directory. The procedure lives in `docs/autopilot/playbook.md` (Single active writer).
+
 ## Rules
 
 - **Overwrite/update** `docs/SESSION_HANDOFF.md` in place — one canonical "current pause" file.
